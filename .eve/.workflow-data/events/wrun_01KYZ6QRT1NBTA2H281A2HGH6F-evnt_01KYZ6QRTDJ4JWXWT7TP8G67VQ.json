@@ -1,0 +1,29 @@
+{
+  "eventType": "run_created",
+  "specVersion": 5,
+  "eventData": {
+    "deploymentId": "msamw7mp-2e78256d-4486-46cc-a8e6-2c16613e73c5",
+    "workflowName": "workflow//eve//workflowEntry",
+    "input": {
+      "__type": "Uint8Array",
+      "data": "ZGV2bFtbMV0seyJpbnB1dCI6MiwibGltaXRzIjotMSwic2VyaWFsaXplZENvbnRleHQiOjR9LHsibWVzc2FnZSI6MywiY29udGV4dCI6LTEsIm91dHB1dFNjaGVtYSI6LTF9LCJNdWx0YXMgZGUgbGEgcGF0ZW50ZSBBQjEyM0NEIix7ImV2ZS5idW5kbGUiOjUsImV2ZS5jaGFubmVsIjo4LCJldmUuY2hhbm5lbEluc3RydW1lbnRhdGlvbiI6MTEsImV2ZS5jb250aW51YXRpb25Ub2tlbiI6MTQsImV2ZS5tb2RlIjoxNSwiZXZlLmF1dGgiOjE2LCJldmUuaW5pdGlhdG9yQXV0aCI6MTYsImV2ZS5jYXBhYmlsaXRpZXMiOjIwLCJldmUuY2hhbm5lbFJlcXVlc3RJZCI6MjJ9LHsibm9kZUlkIjotMSwic291cmNlIjo2fSx7ImtpbmQiOjd9LCJkZXZlbG9wbWVudCIseyJraW5kIjo5LCJzdGF0ZSI6MTB9LCJodHRwIix7fSx7ImtpbmQiOjEyLCJtZXRhZGF0YSI6MTN9LCJjaGFubmVsOmV2ZSIse30sImV2ZTpldmU6MTBhZTc1MWYtMjYyNy00ZTYxLWI1ODItODdkYzQzMjM5MDZiIiwiY29udmVyc2F0aW9uIix7ImF0dHJpYnV0ZXMiOjE3LCJhdXRoZW50aWNhdG9yIjoxOCwicHJpbmNpcGFsSWQiOjE5LCJwcmluY2lwYWxUeXBlIjoxOX0se30sIm5vbmUiLCJhbm9ueW1vdXMiLHsicmVxdWVzdElucHV0IjoyMX0sdHJ1ZSwiYnR6cmctMTc4NTYwNjE2ODk3My0wZjEzNTJkMGNlMjUiXQ=="
+    },
+    "executionContext": {
+      "traceCarrier": {},
+      "workflowCoreVersion": "5.0.0-beta.38",
+      "features": {
+        "encryption": false
+      }
+    },
+    "attributes": {
+      "$eve.channel_request_id": "btzrg-1785606168973-0f1352d0ce25",
+      "$eve.type": "session",
+      "$eve.trigger": "http",
+      "$eve.title": "Multas de la patente AB123CD"
+    },
+    "allowReservedAttributes": true
+  },
+  "runId": "wrun_01KYZ6QRT1NBTA2H281A2HGH6F",
+  "eventId": "evnt_01KYZ6QRTDJ4JWXWT7TP8G67VQ",
+  "createdAt": "2026-08-01T17:42:49.421Z"
+}
