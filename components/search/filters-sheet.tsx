@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { SlidersHorizontal } from "lucide-react"
 
 import { FeatureIcon } from "@/components/feature-icon"
@@ -80,33 +81,54 @@ export function FiltersSheet({
 }
 
 function FiltersForm({ filters, onApply }: { filters: Filters; onApply: (f: Filters) => void }) {
+  const [maxPrice, setMaxPrice] = useState(filters.maxPrice)
+  const [maxDistance, setMaxDistance] = useState(filters.maxDistance)
+  const [schedule, setSchedule] = useState(filters.schedule)
+  const [features, setFeatures] = useState<ParkingFeature[]>(filters.features)
+
   return (
     <form
       className="flex flex-col gap-6 overflow-y-auto px-4 pb-2"
       onSubmit={(e) => {
         e.preventDefault()
-        const data = new FormData(e.currentTarget)
-        onApply({
-          maxPrice: Number(data.get("maxPrice")),
-          maxDistance: Number(data.get("maxDistance")),
-          schedule: String(data.get("schedule") || "cualquiera"),
-          features: (data.getAll("features") as ParkingFeature[]) ?? [],
-        })
+        onApply({ maxPrice, maxDistance, schedule, features })
       }}
     >
       <Field>
         <FieldLabel>Precio máximo por hora</FieldLabel>
-        <PriceControl defaultValue={filters.maxPrice} />
+        <div className="flex flex-col gap-2">
+          <Slider
+            min={400}
+            max={1000}
+            step={20}
+            value={[maxPrice]}
+            onValueChange={(v) => setMaxPrice(Array.isArray(v) ? v[0] : v)}
+          />
+          <span className="text-sm font-semibold text-primary">{formatCurrency(maxPrice)}</span>
+        </div>
       </Field>
 
       <Field>
         <FieldLabel>Distancia máxima</FieldLabel>
-        <DistanceControl defaultValue={filters.maxDistance} />
+        <div className="flex flex-col gap-2">
+          <Slider
+            min={1}
+            max={6}
+            step={0.5}
+            value={[maxDistance]}
+            onValueChange={(v) => setMaxDistance(Array.isArray(v) ? v[0] : v)}
+          />
+          <span className="text-sm font-semibold text-primary">{formatKm(maxDistance)}</span>
+        </div>
       </Field>
 
       <FieldSet>
         <FieldLegend>Horario</FieldLegend>
-        <ToggleGroup type="single" name="schedule" defaultValue={filters.schedule} className="flex-wrap justify-start">
+        <ToggleGroup
+          value={schedule ? [schedule] : []}
+          onValueChange={(v) => v[0] && setSchedule(v[0])}
+          className="flex-wrap justify-start"
+        >
           {scheduleOptions.map((o) => (
             <ToggleGroupItem key={o.value} value={o.value} className="rounded-full px-4">
               {o.label}
@@ -118,9 +140,9 @@ function FiltersForm({ filters, onApply }: { filters: Filters; onApply: (f: Filt
       <FieldSet>
         <FieldLegend>Características</FieldLegend>
         <ToggleGroup
-          type="multiple"
-          name="features"
-          defaultValue={filters.features}
+          multiple
+          value={features}
+          onValueChange={(v) => setFeatures(v as ParkingFeature[])}
           className="flex-wrap justify-start"
         >
           {featureOptions.map((f) => (
@@ -143,51 +165,5 @@ function FiltersForm({ filters, onApply }: { filters: Filters; onApply: (f: Filt
         <SheetClose render={<Button type="submit" className="flex-1">Aplicar</Button>} />
       </SheetFooter>
     </form>
-  )
-}
-
-function PriceControl({ defaultValue }: { defaultValue: number }) {
-  return (
-    <div className="flex flex-col gap-2">
-      <input type="hidden" name="maxPrice" defaultValue={defaultValue} id="maxPrice-input" />
-      <Slider
-        min={400}
-        max={1000}
-        step={20}
-        defaultValue={[defaultValue]}
-        onValueChange={(v) => {
-          const input = document.getElementById("maxPrice-input") as HTMLInputElement | null
-          if (input) input.value = String(v[0])
-          const label = document.getElementById("maxPrice-label")
-          if (label) label.textContent = formatCurrency(v[0])
-        }}
-      />
-      <span id="maxPrice-label" className="text-sm font-semibold text-primary">
-        {formatCurrency(defaultValue)}
-      </span>
-    </div>
-  )
-}
-
-function DistanceControl({ defaultValue }: { defaultValue: number }) {
-  return (
-    <div className="flex flex-col gap-2">
-      <input type="hidden" name="maxDistance" defaultValue={defaultValue} id="maxDistance-input" />
-      <Slider
-        min={1}
-        max={6}
-        step={0.5}
-        defaultValue={[defaultValue]}
-        onValueChange={(v) => {
-          const input = document.getElementById("maxDistance-input") as HTMLInputElement | null
-          if (input) input.value = String(v[0])
-          const label = document.getElementById("maxDistance-label")
-          if (label) label.textContent = formatKm(v[0])
-        }}
-      />
-      <span id="maxDistance-label" className="text-sm font-semibold text-primary">
-        {formatKm(defaultValue)}
-      </span>
-    </div>
   )
 }

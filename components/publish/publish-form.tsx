@@ -108,9 +108,8 @@ export function PublishForm() {
             <Field>
               <FieldLabel>Tipo de cochera</FieldLabel>
               <ToggleGroup
-                type="single"
-                value={type}
-                onValueChange={(v) => v && setType(v)}
+                value={type ? [type] : []}
+                onValueChange={(v) => v[0] && setType(v[0])}
                 variant="outline"
                 className="w-full"
               >
@@ -128,9 +127,9 @@ export function PublishForm() {
             <Field>
               <FieldLabel>Comodidades</FieldLabel>
               <ToggleGroup
-                type="multiple"
+                multiple
                 value={features}
-                onValueChange={setFeatures}
+                onValueChange={(v) => setFeatures(v)}
                 variant="outline"
                 className="flex flex-wrap justify-start gap-2"
               >
