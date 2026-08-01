@@ -70,7 +70,7 @@ function Markdown({ text }: { text: string }) {
   )
 }
 
-function MessageText({ parts }: { parts: readonly EveMessagePart[] }) {
+function MessageText({ parts }: { parts: EveMessagePart[] }) {
   const text = parts
     .filter((p) => p.type === "text")
     .map((p) => (p as { text: string }).text)
@@ -78,7 +78,7 @@ function MessageText({ parts }: { parts: readonly EveMessagePart[] }) {
   return <Markdown text={text} />
 }
 
-function ToolBadges({ parts }: { parts: readonly EveMessagePart[] }) {
+function ToolBadges({ parts }: { parts: EveMessagePart[] }) {
   const tools = parts.filter(
     (p) => p.type === "dynamic-tool" && !p.toolMetadata?.eve?.inputRequest,
   )
