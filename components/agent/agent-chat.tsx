@@ -38,12 +38,50 @@ function getInputRequest(message: EveMessage | undefined): InputRequest | undefi
   return part?.toolMetadata?.eve?.inputRequest as InputRequest | undefined
 }
 
-function TextParts({ parts }: { parts: EveMessagePart[] }) {
+function renderInline(text: string) {
+  const segments = text.split(/(\*\*[^*]+\*\*)/g)
+  return segments.map((seg, i) => {
+    const bold = seg.match(/^\*\*([^*]+)\*\*$/)
+    if (bold)
+      return (
+        <strong key={i} className="font-semibold">
+          {bold[1]}
+        </strong>
+      )
+    return <span key={i}>{seg}</span>
+  })
+}
+
+function Markdown({ text }: { text: string }) {
+  const lines = text.split("\n")
   return (
-    <>
-      {parts.map((part, i) => (part.type === "text" ? <span key={i}>{part.text}</span> : null))}
-    </>
+    <div className="flex flex-col gap-1">
+      {lines.map((line, i) => {
+        const trimmed = line.trim()
+        if (trimmed.length === 0) return <div key={i} className="h-1" />
+        const bullet = trimmed.match(/^[-*]\s+(.*)$/)
+        if (bullet) {
+          return (
+            <div key={i} className="flex gap-2">
+              <span className="text-primary" aria-hidden>
+                •
+              </span>
+              <span className="flex-1">{renderInline(bullet[1])}</span>
+            </div>
+          )
+        }
+        return <div key={i}>{renderInline(trimmed)}</div>
+      })}
+    </div>
   )
+}
+
+function MessageText({ parts }: { parts: EveMessagePart[] }) {
+  const text = parts
+    .filter((p) => p.type === "text")
+    .map((p) => (p as { text: string }).text)
+    .join("")
+  return <Markdown text={text} />
 }
 
 function ToolBadges({ parts }: { parts: EveMessagePart[] }) {
@@ -58,7 +96,7 @@ function ToolBadges({ parts }: { parts: EveMessagePart[] }) {
         return (
           <div
             key={i}
-            className="flex items-center gap-2 rounded-lg border border-border bg-secondary/50 px-2.5 py-1.5 text-xs text-muted-foreground"
+            className="flex w-fit items-center gap-2 rounded-lg border border-border bg-secondary/50 px-2.5 py-1.5 text-xs text-muted-foreground"
           >
             <Wrench className="size-3.5 shrink-0 text-primary" />
             <span>{TOOL_LABELS[name] ?? name}</span>
@@ -86,12 +124,11 @@ export function AgentChat({
 
   const isBusy = agent.status === "submitted" || agent.status === "streaming"
   const messages = agent.data.messages
-  const lastMessage = messages.at(-1)
-  const pending = getInputRequest(lastMessage)
+  const pending = getInputRequest(messages.at(-1))
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" })
-  }, [messages, agent.status])
+  }, [messages, agent.status, pending])
 
   function send(text: string) {
     const value = text.trim()
@@ -110,14 +147,13 @@ export function AgentChat({
   return (
     <div className="flex min-h-dvh flex-col bg-background">
       <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-border bg-background/90 px-4 py-3 backdrop-blur">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rounded-full"
-          render={<Link href="/" aria-label="Volver" />}
+        <Link
+          href="/"
+          aria-label="Volver"
+          className="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-foreground transition-colors hover:bg-secondary"
         >
-          <ArrowLeft />
-        </Button>
+          <ArrowLeft className="size-5" />
+        </Link>
         <Avatar className="size-9">
           <AvatarFallback className="bg-primary/15 text-primary">
             <Sparkles className="size-4" />
@@ -142,16 +178,13 @@ export function AgentChat({
           </div>
 
           {messages.map((m) => {
-            const request = getInputRequest(m)
             const hasText = m.parts.some((p) => p.type === "text" && p.text.trim().length > 0)
             return (
               <div key={m.id} className="flex flex-col gap-2">
                 {m.role === "assistant" && <ToolBadges parts={m.parts} />}
 
                 {hasText && (
-                  <div
-                    className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}
-                  >
+                  <div className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
                     <div
                       className={cn(
                         "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
@@ -160,40 +193,49 @@ export function AgentChat({
                           : "rounded-bl-md bg-card text-card-foreground",
                       )}
                     >
-                      <TextParts parts={m.parts} />
-                    </div>
-                  </div>
-                )}
-
-                {request && (
-                  <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4">
-                    <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
-                      <ShieldCheck className="size-4 text-primary" />
-                      Confirmación requerida
-                    </div>
-                    {request.prompt && (
-                      <p className="mb-3 text-sm text-muted-foreground">{request.prompt}</p>
-                    )}
-                    <div className="flex gap-2">
-                      <Button size="sm" className="flex-1 rounded-full" onClick={() => answerApproval("approve")}>
-                        <Check className="size-4" />
-                        Confirmar pago
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex-1 rounded-full"
-                        onClick={() => answerApproval("deny")}
-                      >
-                        <X className="size-4" />
-                        Cancelar
-                      </Button>
+                      <MessageText parts={m.parts} />
                     </div>
                   </div>
                 )}
               </div>
             )
           })}
+
+          {/* Single approval panel for the pending human-in-the-loop request */}
+          {pending && (
+            <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4">
+              <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
+                <ShieldCheck className="size-4 text-primary" />
+                Confirmación requerida
+              </div>
+              {pending.prompt && (
+                <p className="mb-3 text-sm leading-relaxed text-muted-foreground">
+                  {pending.prompt}
+                </p>
+              )}
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  className="flex-1 rounded-full"
+                  disabled={isBusy}
+                  onClick={() => answerApproval("approve")}
+                >
+                  <Check className="size-4" />
+                  Confirmar pago
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="flex-1 rounded-full"
+                  disabled={isBusy}
+                  onClick={() => answerApproval("deny")}
+                >
+                  <X className="size-4" />
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          )}
 
           {isBusy && !pending && (
             <div className="flex justify-start">
@@ -213,48 +255,49 @@ export function AgentChat({
         </div>
       </div>
 
-      <div className="sticky bottom-0 flex flex-col gap-3 border-t border-border bg-background/90 p-4 backdrop-blur">
-        {showSuggestions && suggestions.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {suggestions.map((s) => (
-              <Button
-                key={s}
-                variant="outline"
-                size="sm"
-                className="rounded-full"
-                onClick={() => send(s)}
+      {!pending && (
+        <div className="sticky bottom-0 flex flex-col gap-3 border-t border-border bg-background/90 p-4 backdrop-blur">
+          {showSuggestions && suggestions.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {suggestions.map((s) => (
+                <Button
+                  key={s}
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full"
+                  onClick={() => send(s)}
+                >
+                  {s}
+                </Button>
+              ))}
+            </div>
+          )}
+          <InputGroup>
+            <InputGroupInput
+              placeholder="Escribí tu mensaje..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.nativeEvent.isComposing && e.keyCode !== 229) {
+                  e.preventDefault()
+                  send(input)
+                }
+              }}
+            />
+            <InputGroupAddon align="inline-end">
+              <InputGroupButton
+                size="icon-xs"
+                variant="default"
+                disabled={isBusy || !input.trim()}
+                onClick={() => send(input)}
+                aria-label="Enviar"
               >
-                {s}
-              </Button>
-            ))}
-          </div>
-        )}
-        <InputGroup>
-          <InputGroupInput
-            placeholder={pending ? "Confirmá o cancelá arriba..." : "Escribí tu mensaje..."}
-            value={input}
-            disabled={Boolean(pending)}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.nativeEvent.isComposing && e.keyCode !== 229) {
-                e.preventDefault()
-                send(input)
-              }
-            }}
-          />
-          <InputGroupAddon align="inline-end">
-            <InputGroupButton
-              size="icon-xs"
-              variant="default"
-              disabled={isBusy || Boolean(pending) || !input.trim()}
-              onClick={() => send(input)}
-              aria-label="Enviar"
-            >
-              <Sparkles />
-            </InputGroupButton>
-          </InputGroupAddon>
-        </InputGroup>
-      </div>
+                <Sparkles />
+              </InputGroupButton>
+            </InputGroupAddon>
+          </InputGroup>
+        </div>
+      )}
     </div>
   )
 }

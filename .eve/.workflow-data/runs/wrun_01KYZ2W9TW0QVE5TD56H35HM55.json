@@ -1,0 +1,27 @@
+{
+  "runId": "wrun_01KYZ2W9TW0QVE5TD56H35HM55",
+  "deploymentId": "msal9tv9-cf66b9a6-772b-47c1-9f83-cc028cebda95",
+  "workflowName": "workflow//eve//workflowEntry",
+  "specVersion": 5,
+  "executionContext": {
+    "traceCarrier": {},
+    "workflowCoreVersion": "5.0.0-beta.38",
+    "features": {
+      "encryption": false
+    }
+  },
+  "input": {
+    "__type": "Uint8Array",
+    "data": "ZGV2bFtbMV0seyJpbnB1dCI6MiwibGltaXRzIjotMSwic2VyaWFsaXplZENvbnRleHQiOjR9LHsibWVzc2FnZSI6MywiY29udGV4dCI6LTEsIm91dHB1dFNjaGVtYSI6LTF9LCJQYWdhciBwYXRlbnRlIEFCMTIzQ0QiLHsiZXZlLmJ1bmRsZSI6NSwiZXZlLmNoYW5uZWwiOjgsImV2ZS5jaGFubmVsSW5zdHJ1bWVudGF0aW9uIjoxMSwiZXZlLmNvbnRpbnVhdGlvblRva2VuIjoxNCwiZXZlLm1vZGUiOjE1LCJldmUuYXV0aCI6MTYsImV2ZS5pbml0aWF0b3JBdXRoIjoxNiwiZXZlLmNhcGFiaWxpdGllcyI6MjAsImV2ZS5jaGFubmVsUmVxdWVzdElkIjoyMn0seyJub2RlSWQiOi0xLCJzb3VyY2UiOjZ9LHsia2luZCI6N30sImRldmVsb3BtZW50Iix7ImtpbmQiOjksInN0YXRlIjoxMH0sImh0dHAiLHt9LHsia2luZCI6MTIsIm1ldGFkYXRhIjoxM30sImNoYW5uZWw6ZXZlIix7fSwiZXZlOmV2ZTplYTU4OTc2MS1lN2NhLTQwZTItOTc3My04NjgzNDhiMmZkOTEiLCJjb252ZXJzYXRpb24iLHsiYXR0cmlidXRlcyI6MTcsImF1dGhlbnRpY2F0b3IiOjE4LCJwcmluY2lwYWxJZCI6MTksInByaW5jaXBhbFR5cGUiOjE5fSx7fSwibm9uZSIsImFub255bW91cyIseyJyZXF1ZXN0SW5wdXQiOjIxfSx0cnVlLCJnajlobS0xNzg1NjAyMTIzNTk1LWVhNDViYTBkOGFjOSJd"
+  },
+  "createdAt": "2026-08-01T16:35:23.615Z",
+  "status": "running",
+  "startedAt": "2026-08-01T16:35:23.624Z",
+  "updatedAt": "2026-08-01T16:35:23.624Z",
+  "attributes": {
+    "$eve.channel_request_id": "gj9hm-1785602123595-ea45ba0d8ac9",
+    "$eve.type": "session",
+    "$eve.trigger": "http",
+    "$eve.title": "Pagar patente AB123CD"
+  }
+}

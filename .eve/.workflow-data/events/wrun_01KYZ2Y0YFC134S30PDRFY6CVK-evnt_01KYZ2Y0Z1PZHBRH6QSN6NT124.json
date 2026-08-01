@@ -1,0 +1,15 @@
+{
+  "eventType": "step_created",
+  "runId": "wrun_01KYZ2Y0YFC134S30PDRFY6CVK",
+  "eventId": "evnt_01KYZ2Y0Z1PZHBRH6QSN6NT124",
+  "createdAt": "2026-08-01T16:36:20.063Z",
+  "specVersion": 5,
+  "correlationId": "step_01KYZ2Y0YFHY0NVQC5M46Z0GVA",
+  "eventData": {
+    "stepName": "step//eve@0.29.4//createSessionStep",
+    "input": {
+      "__type": "Uint8Array",
+      "data": "ZGV2bFt7ImFyZ3MiOjEsImNsb3N1cmVWYXJzIjotMSwidGhpc1ZhbCI6LTF9LFsyXSx7ImNvbXBpbGVkQXJ0aWZhY3RzU291cmNlIjozLCJjb250aW51YXRpb25Ub2tlbiI6NSwiaW5oZXJpdGVkTGltaXRzIjotMSwibm9kZUlkIjotMSwib3V0cHV0U2NoZW1hIjotMSwicm9vdFNlc3Npb25JZCI6LTEsInNlc3Npb25JZCI6Niwic3ViYWdlbnREZXB0aCI6LTF9LHsia2luZCI6NH0sImRldmVsb3BtZW50IiwiZXZlOmV2ZTo4ZDMzYjUwOC0xNGQxLTRlM2EtODMzZS04ZmQzZmUyZjg0ZTkiLCJ3cnVuXzAxS1laMlkwWUZDMTM0UzMwUERSRlk2Q1ZLIl0="
+    }
+  }
+}
