@@ -5,7 +5,7 @@ import { ArrowLeft, Check, ShieldCheck, Sparkles, Wrench, X } from "lucide-react
 import Link from "next/link"
 
 import { useEveAgent } from "eve/react"
-import type { EveMessage, EveMessagePart } from "eve/react"
+import type { EveMessage, EveMessageInputRequest, EveMessagePart } from "eve/react"
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -25,17 +25,11 @@ const TOOL_LABELS: Record<string, string> = {
   pay_patente: "Preparando pago de patente",
 }
 
-type InputRequest = {
-  requestId: string
-  prompt?: string
-  options?: { id: string; label?: string }[]
-}
-
-function getInputRequest(message: EveMessage | undefined): InputRequest | undefined {
+function getInputRequest(message: EveMessage | undefined): EveMessageInputRequest | undefined {
   const part = message?.parts.find(
     (p) => p.type === "dynamic-tool" && p.toolMetadata?.eve?.inputRequest,
   )
-  return part?.toolMetadata?.eve?.inputRequest as InputRequest | undefined
+  return part?.type === "dynamic-tool" ? part.toolMetadata?.eve?.inputRequest : undefined
 }
 
 function renderInline(text: string) {
@@ -130,15 +124,24 @@ export function AgentChat({
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" })
   }, [messages, agent.status, pending])
 
+  const pendingOptions = pending?.options ?? []
+  const pendingAllowsText =
+    Boolean(pending) && (pending?.allowFreeform === true || pending?.display === "text")
+  const inputVisible = !pending || pendingAllowsText
+
   function send(text: string) {
     const value = text.trim()
     if (!value || isBusy) return
     setInput("")
-    void agent.send({ message: value })
+    if (pending) {
+      void agent.send({ inputResponses: [{ requestId: pending.requestId, text: value }] })
+    } else {
+      void agent.send({ message: value })
+    }
   }
 
-  function answerApproval(optionId: string) {
-    if (!pending) return
+  function answerOption(optionId: string) {
+    if (!pending || isBusy) return
     void agent.send({ inputResponses: [{ requestId: pending.requestId, optionId }] })
   }
 
@@ -201,38 +204,46 @@ export function AgentChat({
             )
           })}
 
-          {/* Single approval panel for the pending human-in-the-loop request */}
-          {pending && (
-            <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4">
+          {/* Single panel for the pending human-in-the-loop request (approval or question) */}
+          {pending && pendingOptions.length > 0 && (
+            <div
+              className={cn(
+                "rounded-2xl border p-4",
+                pending.kind === "tool-approval"
+                  ? "border-primary/30 bg-primary/5"
+                  : "border-border bg-card",
+              )}
+            >
               <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
-                <ShieldCheck className="size-4 text-primary" />
-                Confirmación requerida
+                {pending.kind === "tool-approval" ? (
+                  <ShieldCheck className="size-4 text-primary" />
+                ) : (
+                  <Sparkles className="size-4 text-primary" />
+                )}
+                {pending.kind === "tool-approval" ? "Confirmación requerida" : "Elegí una opción"}
               </div>
               {pending.prompt && (
                 <p className="mb-3 text-sm leading-relaxed text-muted-foreground">
                   {pending.prompt}
                 </p>
               )}
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  className="flex-1 rounded-full"
-                  disabled={isBusy}
-                  onClick={() => answerApproval("approve")}
-                >
-                  <Check className="size-4" />
-                  Confirmar pago
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="flex-1 rounded-full"
-                  disabled={isBusy}
-                  onClick={() => answerApproval("deny")}
-                >
-                  <X className="size-4" />
-                  Cancelar
-                </Button>
+              <div className="flex flex-wrap gap-2">
+                {pendingOptions.map((opt) => {
+                  const isDeny = opt.style === "danger" || opt.id === "deny" || opt.id === "reject"
+                  return (
+                    <Button
+                      key={opt.id}
+                      size="sm"
+                      variant={isDeny ? "outline" : "default"}
+                      className="flex-1 rounded-full"
+                      disabled={isBusy}
+                      onClick={() => answerOption(opt.id)}
+                    >
+                      {isDeny ? <X className="size-4" /> : <Check className="size-4" />}
+                      {opt.label}
+                    </Button>
+                  )
+                })}
               </div>
             </div>
           )}
@@ -255,7 +266,7 @@ export function AgentChat({
         </div>
       </div>
 
-      {!pending && (
+      {inputVisible && (
         <div className="sticky bottom-0 flex flex-col gap-3 border-t border-border bg-background/90 p-4 backdrop-blur">
           {showSuggestions && suggestions.length > 0 && (
             <div className="flex flex-wrap gap-2">
