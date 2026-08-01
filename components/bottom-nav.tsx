@@ -2,14 +2,14 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Search, Shield } from "lucide-react"
+import { Home, SquareParking, Shield } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
 const items = [
-  { href: "/", label: "Home", icon: Home, primary: true },
-  { href: "/buscar", label: "Buscar", icon: Search, primary: true },
-  { href: "/seguro", label: "Seguro", icon: Shield, primary: false },
+  { href: "/", label: "Inicio", icon: Home, primary: true },
+  { href: "/cochera", label: "Cochera", icon: SquareParking, primary: true },
+  { href: "/seguro", label: "Seguro", icon: Shield, primary: true },
 ]
 
 export function BottomNav() {
