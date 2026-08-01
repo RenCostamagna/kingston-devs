@@ -1,0 +1,45 @@
+{
+  "eventType": "attr_set",
+  "specVersion": 5,
+  "eventData": {
+    "changes": [
+      {
+        "key": "$eve.model",
+        "value": "anthropic/claude-sonnet-5"
+      },
+      {
+        "key": "$eve.input_tokens",
+        "value": "7576"
+      },
+      {
+        "key": "$eve.output_tokens",
+        "value": "77"
+      },
+      {
+        "key": "$eve.cache_read_tokens",
+        "value": "0"
+      },
+      {
+        "key": "$eve.cache_write_tokens",
+        "value": "7574"
+      },
+      {
+        "key": "$eve.cost_usd",
+        "value": "0.000774"
+      },
+      {
+        "key": "$eve.tool_count",
+        "value": "16"
+      }
+    ],
+    "writer": {
+      "type": "step",
+      "stepId": "step_01KYZ2PE5HFNK92NCMEBSW6GX1",
+      "attempt": 1
+    },
+    "allowReservedAttributes": true
+  },
+  "runId": "wrun_01KYZ2PE5H8NJRQ0PD8AX9GKD0",
+  "eventId": "evnt_01KYZ2PGHYVNEH2PA6JAY266MH",
+  "createdAt": "2026-08-01T16:32:13.886Z"
+}
