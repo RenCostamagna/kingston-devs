@@ -192,7 +192,7 @@ export const insurers: Insurer[] = [
   {
     id: "ins-01",
     name: "Zurich Seguros",
-    monthly: 18400,
+    monthly: 73600,
     coverage: "Todo riesgo",
     vsAverage: -12,
     badge: "Mejor precio",
@@ -200,24 +200,24 @@ export const insurers: Insurer[] = [
   {
     id: "ins-02",
     name: "Sancor Seguros",
-    monthly: 19900,
+    monthly: 79600,
     coverage: "Todo riesgo",
     vsAverage: -4,
   },
   {
     id: "ins-03",
     name: "La Caja",
-    monthly: 21500,
+    monthly: 86000,
     coverage: "Todo riesgo",
     vsAverage: 3,
   },
   {
     id: "ins-04",
     name: "Mercantil Andina",
-    monthly: 22800,
+    monthly: 91200,
     coverage: "Todo riesgo",
     vsAverage: 9,
   },
 ]
 
-export const historicalAverage = 20700
+export const historicalAverage = 82800
