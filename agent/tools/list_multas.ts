@@ -1,6 +1,7 @@
 import { defineTool } from "eve/tools"
 import { z } from "zod"
 
+import { findMockVehicleByPlate, listMockMultasByPlate } from "../../lib/mock-plates"
 import { listMultasByPlate } from "../../lib/vehicles"
 
 export default defineTool({
@@ -11,7 +12,7 @@ export default defineTool({
     onlyPending: z.boolean().optional().describe("Si es true, devuelve solo las multas pendientes"),
   }),
   async execute({ plate, onlyPending }) {
-    const multas = await listMultasByPlate(plate)
+    const multas = findMockVehicleByPlate(plate) ? listMockMultasByPlate(plate) : await listMultasByPlate(plate)
     const filtered = onlyPending ? multas.filter((m) => m.status === "pendiente") : multas
     return {
       plate,

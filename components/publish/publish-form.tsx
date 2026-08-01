@@ -43,7 +43,7 @@ export function PublishForm() {
   }
 
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="mx-auto flex min-h-dvh max-w-md flex-col">
       <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-border bg-background/90 px-4 py-3 backdrop-blur">
         <Button variant="ghost" size="icon" className="rounded-full" onClick={back} aria-label="Volver">
           <ArrowLeft />

@@ -1,0 +1,96 @@
+{
+  "vehicles": [
+    {
+      "id": "mock-hue969",
+      "plate": "HUE969",
+      "brand": "Volkswagen",
+      "model": "Gol Trend",
+      "year": 2018,
+      "owner_name": "Usuario Demo",
+      "patente_status": "vencida",
+      "patente_period": "Cuota 2/2026",
+      "patente_amount_due": 38000,
+      "patente_due_date": "2026-06-15",
+      "payment_url": null,
+      "created_at": "2026-01-01T00:00:00Z"
+    },
+    {
+      "id": "mock-nar846",
+      "plate": "NAR846",
+      "brand": "Renault",
+      "model": "Sandero",
+      "year": 2020,
+      "owner_name": "Usuario Demo",
+      "patente_status": "pendiente",
+      "patente_period": "Cuota 3/2026",
+      "patente_amount_due": 52000,
+      "patente_due_date": "2026-09-10",
+      "payment_url": "https://pagos.transito.example/patente/NAR846",
+      "created_at": "2026-01-01T00:00:00Z"
+    },
+    {
+      "id": "mock-ai172dz",
+      "plate": "AI172DZ",
+      "brand": "Toyota",
+      "model": "Corolla",
+      "year": 2022,
+      "owner_name": "Usuario Demo",
+      "patente_status": "al_dia",
+      "patente_period": null,
+      "patente_amount_due": 0,
+      "patente_due_date": null,
+      "payment_url": null,
+      "created_at": "2026-01-01T00:00:00Z"
+    }
+  ],
+  "multas": [
+    {
+      "id": "mock-multa-hue969-1",
+      "plate": "HUE969",
+      "code": "ACTA-2026-05001",
+      "description": "Semáforo en rojo",
+      "location": "Av. Pellegrini y Córdoba, Rosario",
+      "infraction_date": "2026-07-10",
+      "amount": 60000,
+      "status": "pendiente",
+      "source": "manual",
+      "email_id": null,
+      "discount_until": "2026-08-15",
+      "discount_amount": 30000,
+      "payment_url": "https://pagos.transito.example/acta/ACTA-2026-05001",
+      "created_at": "2026-07-10T00:00:00Z"
+    },
+    {
+      "id": "mock-multa-nar846-1",
+      "plate": "NAR846",
+      "code": "ACTA-2026-05002",
+      "description": "Estacionamiento indebido en doble fila",
+      "location": "Bv. Oroño 1500, Rosario",
+      "infraction_date": "2026-07-20",
+      "amount": 35000,
+      "status": "pendiente",
+      "source": "manual",
+      "email_id": null,
+      "discount_until": null,
+      "discount_amount": null,
+      "payment_url": null,
+      "created_at": "2026-07-20T00:00:00Z"
+    },
+    {
+      "id": "mock-multa-ai172dz-1",
+      "plate": "AI172DZ",
+      "code": "ACTA-2026-04980",
+      "description": "Exceso de velocidad",
+      "location": "Autopista Rosario-Santa Fe km 12",
+      "infraction_date": "2026-06-01",
+      "amount": 80000,
+      "status": "pagada",
+      "source": "manual",
+      "email_id": null,
+      "discount_until": null,
+      "discount_amount": null,
+      "payment_url": null,
+      "created_at": "2026-06-01T00:00:00Z"
+    }
+  ]
+}

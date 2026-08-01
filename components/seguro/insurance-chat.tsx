@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
+import { useRouter } from "next/navigation"
 import { ArrowLeft, Send, Sparkles } from "lucide-react"
-import { toast } from "sonner"
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -41,11 +41,14 @@ function buildScript(p: UserProfile): Step[] {
 let nextId = 1
 
 export function InsuranceChat() {
+  const router = useRouter()
   const [profile, setProfile] = useState<UserProfile>(defaultProfile)
   const [messages, setMessages] = useState<Msg[]>([])
   const [stepIndex, setStepIndex] = useState(0)
   const [input, setInput] = useState("")
   const [typing, setTyping] = useState(false)
+  // Sugerencias de la fase posterior a la cotización (elegir otra aseguradora).
+  const [followup, setFollowup] = useState<string[]>([])
   const scrollRef = useRef<HTMLDivElement>(null)
 
   const script = useMemo(() => buildScript(profile), [profile])
@@ -75,19 +78,85 @@ export function InsuranceChat() {
 
     setTimeout(() => {
       setTyping(false)
-      setMessages((m) => [
-        ...m,
-        { id: nextId++, role: "assistant", text: step.reply },
-        ...(step.quotesAfter ? [{ id: nextId++, role: "assistant" as const, quotes: true }] : []),
-      ])
+      setMessages((m) => [...m, { id: nextId++, role: "assistant", text: step.reply }])
       setStepIndex((s) => s + 1)
+
+      // Antes de mostrar las cotizaciones, el agente "piensa" un poco más
+      // mientras dice que está comparando aseguradoras, para que se sienta real.
+      if (step.quotesAfter) {
+        setTyping(true)
+        setTimeout(() => {
+          setTyping(false)
+          setMessages((m) => [
+            ...m,
+            { id: nextId++, role: "assistant", text: "Consultando precios en tiempo real de cada aseguradora..." },
+          ])
+          setTyping(true)
+          setTimeout(() => {
+            setTyping(false)
+            setMessages((m) => [...m, { id: nextId++, role: "assistant", quotes: true }])
+          }, 1800)
+        }, 1500)
+      }
     }, 900)
   }
 
+  // El usuario eligió una aseguradora: el agente "piensa" y confirma que envió
+  // la solicitud de cotización por WhatsApp, y ofrece cotizar con otra.
+  function handleSelectInsurer(name: string) {
+    if (typing) return
+    setFollowup([])
+    setMessages((m) => [...m, { id: nextId++, role: "user", text: `Quiero cotizar con ${name}` }])
+    setTyping(true)
+
+    // Primero el agente "piensa" y avisa que está gestionando la solicitud,
+    // y recién después confirma el envío por WhatsApp.
+    setTimeout(() => {
+      setTyping(false)
+      setMessages((m) => [
+        ...m,
+        { id: nextId++, role: "assistant", text: `Perfecto. Estoy preparando tu solicitud de cotización para ${name}...` },
+      ])
+      setTyping(true)
+      setTimeout(() => {
+        setTyping(false)
+        setMessages((m) => [
+          ...m,
+          {
+            id: nextId++,
+            role: "assistant",
+            text: `Listo, le envié una solicitud de cotización a ${name} por WhatsApp. Un asesor se va a comunicar con vos en breve para avanzar. ¿Querés que cotice con otra aseguradora?`,
+          },
+        ])
+        setFollowup(["Sí, cotizar con otra", "No, así está bien"])
+      }, 2000)
+    }, 1400)
+  }
+
+  // Respuesta a "¿cotizar con otra aseguradora?".
+  function handleFollowup(choice: string) {
+    if (typing) return
+    const wantsMore = choice.startsWith("Sí")
+    setFollowup([])
+    setMessages((m) => [...m, { id: nextId++, role: "user", text: choice }])
+    setTyping(true)
+
+    setTimeout(() => {
+      setTyping(false)
+      setMessages((m) => [
+        ...m,
+        wantsMore
+          ? { id: nextId++, role: "assistant" as const, text: "Perfecto, acá tenés de nuevo las opciones. Elegí la que prefieras." }
+          : { id: nextId++, role: "assistant" as const, text: "Genial. Quedo a disposición para lo que necesites con tu seguro." },
+        ...(wantsMore ? [{ id: nextId++, role: "assistant" as const, quotes: true }] : []),
+      ])
+    }, 1200)
+  }
+
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="mx-auto flex min-h-dvh max-w-md flex-col">
       <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-border bg-background/90 px-4 py-3 backdrop-blur">
-        <Button variant="ghost" size="icon" className="rounded-full" onClick={() => history.back()} aria-label="Volver">
+        <Button variant="ghost" size="icon" className="rounded-full" onClick={() => router.push("/")} aria-label="Volver">
           <ArrowLeft />
         </Button>
         <Avatar className="size-9">
@@ -109,7 +178,7 @@ export function InsuranceChat() {
           {messages.map((m) =>
             m.quotes ? (
               <div key={m.id} className="w-full">
-                <QuoteCards onSelect={(name) => toast.success(`¡Solicitud enviada a ${name}!`)} />
+                <QuoteCards onSelect={handleSelectInsurer} />
               </div>
             ) : (
               <div
@@ -143,14 +212,24 @@ export function InsuranceChat() {
       </div>
 
       <div className="sticky bottom-0 flex flex-col gap-3 border-t border-border bg-background/90 p-4 backdrop-blur">
-        {currentSuggestions.length > 0 && (
+        {followup.length > 0 && !typing ? (
           <div className="flex flex-wrap gap-2">
-            {currentSuggestions.map((s) => (
-              <Button key={s} variant="outline" size="sm" className="rounded-full" onClick={() => send(s)}>
+            {followup.map((s) => (
+              <Button key={s} variant="outline" size="sm" className="rounded-full" onClick={() => handleFollowup(s)}>
                 {s}
               </Button>
             ))}
           </div>
+        ) : (
+          currentSuggestions.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {currentSuggestions.map((s) => (
+                <Button key={s} variant="outline" size="sm" className="rounded-full" onClick={() => send(s)}>
+                  {s}
+                </Button>
+              ))}
+            </div>
+          )
         )}
         <InputGroup>
           <InputGroupInput

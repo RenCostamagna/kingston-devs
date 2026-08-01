@@ -1,6 +1,7 @@
 import { defineTool } from "eve/tools"
 import { z } from "zod"
 
+import { findMockVehicleByPlate } from "../../lib/mock-plates"
 import { findVehicleByPlate } from "../../lib/vehicles"
 
 export default defineTool({
@@ -10,7 +11,7 @@ export default defineTool({
     plate: z.string().min(3).describe("Número de patente / dominio, ej: 'AB123CD' o 'AE 482 KP'"),
   }),
   async execute({ plate }) {
-    const vehicle = await findVehicleByPlate(plate)
+    const vehicle = findMockVehicleByPlate(plate) ?? (await findVehicleByPlate(plate))
     if (!vehicle) {
       return { found: false as const, message: `No encontré ningún vehículo con la patente ${plate}.` }
     }

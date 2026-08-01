@@ -31,7 +31,12 @@ export function ModulePlaceholder({
             <EmptyDescription>{description}</EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
-            <Button render={<Link href="/" />} variant="outline" className="rounded-full">
+            <Button
+              render={<Link href="/" />}
+              nativeButton={false}
+              variant="outline"
+              className="rounded-full"
+            >
               Volver al inicio
             </Button>
           </EmptyContent>

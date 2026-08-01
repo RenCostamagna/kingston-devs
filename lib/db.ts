@@ -34,6 +34,8 @@ export type Vehicle = {
   patente_period: string | null
   patente_amount_due: number
   patente_due_date: string | null
+  /** Official payment link from the organism's own email, if it included one. */
+  payment_url: string | null
   created_at: string
 }
 
@@ -52,20 +54,22 @@ export type Multa = {
   email_id: string | null
   discount_until: string | null
   discount_amount: number | null
+  /** Official payment link from the organism's own email, if it included one. */
+  payment_url: string | null
   created_at: string
 }
 
-export type Payment = {
+export type Notification = {
   id: string
   kind: "patente" | "multa"
-  reference_id: string | null
+  reference_id: string
   plate: string
-  amount: number
-  currency: string
-  status: "pending" | "paid" | "failed"
-  stripe_session_id: string | null
-  stripe_payment_intent: string | null
-  idempotency_key: string | null
+  channel: string
+  fingerprint: string
+  status: "pending" | "sent" | "failed"
+  message_body: string | null
+  error: string | null
+  sent_at: string | null
   created_at: string
 }
 

@@ -2,6 +2,9 @@ import type { NextConfig } from "next"
 import { withEve } from "eve/next"
 
 const nextConfig: NextConfig = {
+  // Estas dependencias del scraper de Rosario son nativas/pesadas y no deben
+  // ser empaquetadas por el bundler del servidor.
+  serverExternalPackages: ["playwright-core", "@sparticuz/chromium"],
   async headers() {
     return [
       {

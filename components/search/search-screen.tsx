@@ -1,27 +1,24 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useMemo, useState } from "react"
+import { useMemo, useRef, useState } from "react"
 import { ArrowLeft, MapPin, Search } from "lucide-react"
 
-import { MapPlaceholder } from "@/components/map-placeholder"
+import { MapView } from "@/components/map-view"
 import { ParkingCardList } from "@/components/parking-card"
 import { defaultFilters, FiltersSheet, type Filters } from "@/components/search/filters-sheet"
 import { Button } from "@/components/ui/button"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
 import { parkingSpots } from "@/lib/mock-data"
-
-const pins = [
-  { top: "30%", left: "28%", price: 850, active: true },
-  { top: "52%", left: "62%", price: 620 },
-  { top: "68%", left: "38%", price: 700 },
-  { top: "40%", left: "78%", price: 980 },
-]
+import { mockPlaceSuggestions } from "@/lib/mock-places"
 
 export function SearchScreen({ initialQuery = "" }: { initialQuery?: string }) {
   const router = useRouter()
   const [query, setQuery] = useState(initialQuery)
   const [filters, setFilters] = useState<Filters>(defaultFilters)
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const blurTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const suggestions = mockPlaceSuggestions(query)
 
   const activeCount = useMemo(() => {
     let n = 0
@@ -53,8 +50,13 @@ export function SearchScreen({ initialQuery = "" }: { initialQuery?: string }) {
       .sort((a, b) => a.distanceKm - b.distanceKm)
   }, [filters, query])
 
+  const mapSpots = useMemo(
+    () => results.map((s) => ({ id: s.id, lat: s.lat, lng: s.lng, title: s.title, price: s.pricePerHour })),
+    [results],
+  )
+
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="mx-auto flex min-h-dvh max-w-md flex-col">
       {/* Search bar + filters */}
       <div className="sticky top-0 z-30 flex flex-col gap-3 border-b border-border bg-background/95 px-4 pb-3 pt-4 backdrop-blur">
         <div className="flex items-center gap-2">
@@ -67,17 +69,46 @@ export function SearchScreen({ initialQuery = "" }: { initialQuery?: string }) {
           >
             <ArrowLeft />
           </Button>
-          <InputGroup className="h-11 flex-1 rounded-xl bg-card">
-            <InputGroupAddon>
-              <Search className="size-4 text-muted-foreground" />
-            </InputGroupAddon>
-            <InputGroupInput
-              placeholder="Dirección o zona"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              aria-label="Buscar ubicación"
-            />
-          </InputGroup>
+          <div className="relative flex-1">
+            <InputGroup className="h-11 rounded-xl bg-card">
+              <InputGroupAddon>
+                <Search className="size-4 text-muted-foreground" />
+              </InputGroupAddon>
+              <InputGroupInput
+                placeholder="Dirección o zona"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => {
+                  blurTimeout.current = setTimeout(() => setShowSuggestions(false), 120)
+                }}
+                aria-label="Buscar ubicación"
+              />
+            </InputGroup>
+            {showSuggestions && suggestions.length > 0 && (
+              <div className="absolute inset-x-0 top-[46px] z-[2000] flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-lg">
+                {suggestions.map((place) => (
+                  <button
+                    key={place.id}
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      if (blurTimeout.current) clearTimeout(blurTimeout.current)
+                      setQuery(place.query)
+                      setShowSuggestions(false)
+                    }}
+                    className="flex items-center gap-2.5 px-3.5 py-2.5 text-left text-sm hover:bg-secondary"
+                  >
+                    <MapPin className="size-4 shrink-0 text-muted-foreground" />
+                    <span className="min-w-0">
+                      <span className="block truncate font-medium">{place.label}</span>
+                      <span className="block truncate text-xs text-muted-foreground">{place.sublabel}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         <div className="flex items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <FiltersSheet filters={filters} onApply={setFilters} activeCount={activeCount} />
@@ -89,7 +120,11 @@ export function SearchScreen({ initialQuery = "" }: { initialQuery?: string }) {
 
       {/* Map (fixed top on mobile) */}
       <div className="px-4 pt-3">
-        <MapPlaceholder className="h-44 w-full" pins={pins} />
+        <MapView
+          className="h-44 w-full"
+          spots={mapSpots}
+          onSelectId={(id) => router.push(`/cochera/${id}`)}
+        />
       </div>
 
       {/* Results list */}

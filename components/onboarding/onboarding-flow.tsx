@@ -1,9 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, ArrowRight, Car, Fuel, Gauge, MapPin, Wallet, Zap } from "lucide-react"
+import { ArrowLeft, ArrowRight, Car, Fuel, Gauge, Lock, Mail, MapPin, Wallet, Zap } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Field, FieldLabel, FieldSet, FieldLegend } from "@/components/ui/field"
@@ -13,25 +12,6 @@ import { Progress } from "@/components/ui/progress"
 import { ONBOARDING_KEY } from "@/components/onboarding/onboarding-gate"
 import { defaultProfile, saveProfile } from "@/lib/profile"
 import type { FuelType, UsagePreference, VehicleUse } from "@/lib/mock-data"
-import { cn } from "@/lib/utils"
-
-const SLIDES = [
-  {
-    image: "/onboarding-find.png",
-    title: "Encontrá cochera en segundos",
-    text: "Buscá lugares disponibles cerca tuyo, compará precios y reservá al instante desde el mapa.",
-  },
-  {
-    image: "/onboarding-earn.png",
-    title: "Generá ingresos con tu cochera",
-    text: "¿Tenés un espacio libre? Publicalo gratis y empezá a ganar dinero cuando no lo uses.",
-  },
-  {
-    image: "/onboarding-insure.png",
-    title: "Asegurá tu auto con IA",
-    text: "Nuestro asistente inteligente te ayuda a encontrar el mejor seguro en una conversación.",
-  },
-]
 
 const FUEL_OPTIONS: FuelType[] = ["Nafta", "Diésel", "GNC", "Híbrido", "Eléctrico"]
 
@@ -41,8 +21,11 @@ const PREFERENCES: { value: UsagePreference; label: string; desc: string; icon: 
   { value: "rapidez", label: "Rapidez", desc: "Reservar en la menor cantidad de pasos", icon: Zap },
 ]
 
-// 0-2 intro slides · 3 vehicle · 4 use+zone · 5 preference · 6 summary
-const TOTAL = SLIDES.length + 4
+// 0 login · 1 vehicle · 2 use+zone · 3 preference · 4 summary
+const TOTAL = 5
+
+type Login = { email: string; password: string }
+const emptyLogin: Login = { email: "", password: "" }
 
 type Form = {
   brand: string
@@ -69,9 +52,10 @@ const emptyForm: Form = {
 export function OnboardingFlow() {
   const router = useRouter()
   const [index, setIndex] = useState(0)
+  const [login, setLogin] = useState<Login>(emptyLogin)
   const [form, setForm] = useState<Form>(emptyForm)
 
-  const isSlide = index < SLIDES.length
+  const isLogin = index === 0
   const isSummary = index === TOTAL - 1
 
   function set<K extends keyof Form>(key: K, value: Form[K]) {
@@ -97,14 +81,16 @@ export function OnboardingFlow() {
   }
 
   const canAdvance =
-    index !== 3
-      ? index !== 4
-        ? index !== 5 || !!form.preference
-        : !!form.use && form.zone.trim().length > 1
-      : !!form.brand.trim() && !!form.model.trim() && !!form.year && !!form.fuel && !!form.mileage
+    index === 0
+      ? !!login.email.trim() && !!login.password.trim()
+      : index === 1
+        ? !!form.brand.trim() && !!form.model.trim() && !!form.year && !!form.fuel && !!form.mileage
+        : index === 2
+          ? !!form.use && form.zone.trim().length > 1
+          : index !== 3 || !!form.preference
 
   return (
-    <div className="flex min-h-dvh flex-col bg-background">
+    <div className="mx-auto flex min-h-dvh max-w-md flex-col bg-background">
       <div className="flex items-center justify-between gap-4 px-5 pt-6">
         {index > 0 ? (
           <button
@@ -127,16 +113,21 @@ export function OnboardingFlow() {
         </button>
       </div>
 
-      {!isSlide && (
+      {!isLogin && (
         <div className="px-5 pt-5">
-          <Progress value={((index - SLIDES.length + 1) / 4) * 100} className="h-1.5" />
+          <Progress value={(index / (TOTAL - 1)) * 100} className="h-1.5" />
         </div>
       )}
 
       <div className="flex flex-1 flex-col overflow-y-auto">
-        {isSlide && <SlideView slide={SLIDES[index]} index={index} />}
+        {isLogin && (
+          <LoginView
+            login={login}
+            onChange={(key, value) => setLogin((l) => ({ ...l, [key]: value }))}
+          />
+        )}
 
-        {index === 3 && (
+        {index === 1 && (
           <StepShell
             title="Contanos de tu vehículo"
             subtitle="Con estos datos personalizamos las cocheras y cotizamos tu seguro."
@@ -191,7 +182,7 @@ export function OnboardingFlow() {
           </StepShell>
         )}
 
-        {index === 4 && (
+        {index === 2 && (
           <StepShell
             title="¿Cómo y dónde lo usás?"
             subtitle="El uso y la zona habitual son clave para calcular el precio del seguro."
@@ -226,7 +217,7 @@ export function OnboardingFlow() {
           </StepShell>
         )}
 
-        {index === 5 && (
+        {index === 3 && (
           <StepShell title="¿Qué es lo más importante para vos?" subtitle="Ajustamos las recomendaciones a tu prioridad.">
             <ToggleGroup
               value={form.preference ? [form.preference] : []}
@@ -263,10 +254,10 @@ export function OnboardingFlow() {
         <Button
           size="lg"
           className="w-full rounded-full"
-          disabled={!isSlide && !isSummary && !canAdvance}
+          disabled={!canAdvance}
           onClick={() => (isSummary ? complete(true) : setIndex((i) => i + 1))}
         >
-          {isSummary ? "Empezar a usar Wheelo" : isSlide ? "Siguiente" : "Continuar"}
+          {isSummary ? "Empezar a usar Wheelo" : isLogin ? "Iniciar sesión" : "Continuar"}
           <ArrowRight data-icon="inline-end" />
         </Button>
       </div>
@@ -274,21 +265,54 @@ export function OnboardingFlow() {
   )
 }
 
-function SlideView({ slide, index }: { slide: (typeof SLIDES)[number]; index: number }) {
+function LoginView({
+  login,
+  onChange,
+}: {
+  login: Login
+  onChange: (key: keyof Login, value: string) => void
+}) {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-8 px-6 text-center">
-      <div className="relative aspect-square w-full max-w-xs overflow-hidden rounded-3xl border border-border bg-card">
-        <Image src={slide.image || "/placeholder.svg"} alt="" fill className="object-cover" priority />
+    <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-6 px-6">
+      <div className="flex flex-col gap-2 text-center">
+        <h1 className="text-2xl font-bold text-balance">Iniciá sesión</h1>
+        <p className="text-pretty leading-relaxed text-muted-foreground">
+          Entrá con tu cuenta para empezar a usar Wheelo.
+        </p>
       </div>
-      <div className="flex flex-col gap-3">
-        <h1 className="text-2xl font-bold text-balance">{slide.title}</h1>
-        <p className="max-w-sm text-pretty leading-relaxed text-muted-foreground">{slide.text}</p>
+      <div className="flex flex-col gap-4">
+        <Field>
+          <FieldLabel htmlFor="email">Email</FieldLabel>
+          <div className="relative">
+            <Mail className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="email"
+              type="email"
+              placeholder="vos@email.com"
+              className="pl-9"
+              value={login.email}
+              onChange={(e) => onChange("email", e.target.value)}
+            />
+          </div>
+        </Field>
+        <Field>
+          <FieldLabel htmlFor="password">Contraseña</FieldLabel>
+          <div className="relative">
+            <Lock className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              className="pl-9"
+              value={login.password}
+              onChange={(e) => onChange("password", e.target.value)}
+            />
+          </div>
+        </Field>
       </div>
-      <div className="flex gap-2" role="tablist" aria-label="Progreso">
-        {SLIDES.map((_, i) => (
-          <span key={i} className={cn("h-2 rounded-full transition-all", i === index ? "w-6 bg-primary" : "w-2 bg-muted")} />
-        ))}
-      </div>
+      <p className="text-center text-xs text-muted-foreground">
+        Modo demo: cualquier email y contraseña funcionan.
+      </p>
     </div>
   )
 }

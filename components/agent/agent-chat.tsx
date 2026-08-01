@@ -20,9 +20,11 @@ import { cn } from "@/lib/utils"
 const TOOL_LABELS: Record<string, string> = {
   get_patente_status: "Consultando estado de patente",
   list_multas: "Buscando multas",
-  scan_gmail_multas: "Revisando Gmail",
-  pay_multa: "Preparando pago de multa",
-  pay_patente: "Preparando pago de patente",
+  scan_gmail_notices: "Revisando Gmail",
+  get_multa_payment_link: "Buscando link de pago de la multa",
+  get_patente_payment_link: "Buscando link de pago de la patente",
+  confirm_multa_payment: "Confirmando pago de multa",
+  confirm_patente_payment: "Confirmando pago de patente",
 }
 
 function getInputRequest(message: EveMessage | undefined): EveMessageInputRequest | undefined {
@@ -106,15 +108,19 @@ export function AgentChat({
   subtitle,
   greeting,
   suggestions,
+  autoStart,
 }: {
   title: string
   subtitle: string
   greeting: string
   suggestions: string[]
+  /** Sent automatically once, e.g. from a one-tap WhatsApp deep link. */
+  autoStart?: { message: string }
 }) {
   const agent = useEveAgent()
   const [input, setInput] = useState("")
   const scrollRef = useRef<HTMLDivElement>(null)
+  const autoStarted = useRef(false)
 
   const isBusy = agent.status === "submitted" || agent.status === "streaming"
   const messages = agent.data.messages
@@ -123,6 +129,15 @@ export function AgentChat({
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" })
   }, [messages, agent.status, pending])
+
+  useEffect(() => {
+    if (!autoStart || autoStarted.current || messages.length > 0) return
+    autoStarted.current = true
+    void agent.send({ message: autoStart.message })
+    // Fires once on mount when a deep link supplies a message; agent.send
+    // is stable enough across renders and autoStarted guards re-invocation.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStart])
 
   const pendingOptions = pending?.options ?? []
   const pendingAllowsText =
@@ -148,7 +163,7 @@ export function AgentChat({
   const showSuggestions = messages.length === 0 && !isBusy
 
   return (
-    <div className="flex min-h-dvh flex-col bg-background">
+    <div className="mx-auto flex min-h-dvh max-w-md flex-col bg-background">
       <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-border bg-background/90 px-4 py-3 backdrop-blur">
         <Link
           href="/"

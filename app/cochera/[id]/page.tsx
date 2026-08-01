@@ -6,7 +6,7 @@ import { AppShell } from "@/components/app-shell"
 import { BookingBar } from "@/components/detail/booking-bar"
 import { Gallery } from "@/components/detail/gallery"
 import { FeatureBadge } from "@/components/feature-icon"
-import { MapPlaceholder } from "@/components/map-placeholder"
+import { MapView } from "@/components/map-view"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { formatCurrency, formatKm } from "@/lib/format"
@@ -89,13 +89,17 @@ export default async function CocheraPage({ params }: { params: Promise<{ id: st
 
         <section className="flex flex-col gap-2">
           <h2 className="text-base font-semibold">Ubicación</h2>
-          <MapPlaceholder className="h-40 w-full" showCenter pins={[{ top: "50%", left: "50%" }]} />
+          <MapView
+            className="h-40 w-full"
+            zoom={15}
+            spots={[{ id: spot.id, lat: spot.lat, lng: spot.lng, title: spot.title }]}
+          />
         </section>
 
         <Separator />
 
         <section className="flex flex-col gap-2 pb-2">
-          <h2 className="text-base font-semibold">Elegí fecha y horario</h2>
+          <h2 className="text-base font-semibold">Elegí cómo reservar</h2>
           <BookingBar spot={spot} />
         </section>
       </main>
