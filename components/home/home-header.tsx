@@ -1,9 +1,12 @@
+"use client"
+
 import { Car, Gauge } from "lucide-react"
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { vehicle } from "@/lib/mock-data"
+import { useProfile } from "@/lib/profile"
 
 export function HomeHeader() {
+  const vehicle = useProfile()
   return (
     <header className="flex flex-col gap-4 px-5 pt-6">
       <div className="flex items-center justify-between">

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { ArrowLeft, Send, Sparkles } from "lucide-react"
 import { toast } from "sonner"
 
@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { InputGroup, InputGroupInput, InputGroupAddon, InputGroupButton } from "@/components/ui/input-group"
 import { QuoteCards } from "@/components/seguro/quote-cards"
-import { vehicle } from "@/lib/mock-data"
+import { defaultProfile, loadProfile, type UserProfile } from "@/lib/profile"
 import { cn } from "@/lib/utils"
 
 type Msg = {
@@ -18,39 +18,48 @@ type Msg = {
   quotes?: boolean
 }
 
-// Scripted assistant flow: each user reply advances the conversation.
-const SCRIPT: { prompt: string; suggestions: string[]; reply: string; quotesAfter?: boolean }[] = [
-  {
-    prompt: `Detecté que tenés un ${vehicle.brand} ${vehicle.model} ${vehicle.year} (${vehicle.plate}). ¿Qué tipo de cobertura buscás?`,
-    suggestions: ["Todo riesgo", "Terceros completo", "Responsabilidad civil"],
-    reply: "Excelente elección. ¿El auto se usa de forma particular o comercial?",
-  },
-  {
-    prompt: "",
-    suggestions: ["Particular", "Comercial"],
-    reply: `Perfecto. ¿Dónde guardás el auto habitualmente? Esto impacta en el precio.`,
-  },
-  {
-    prompt: "",
-    suggestions: ["En cochera", "En la calle"],
-    reply: "Genial, guardarlo en cochera reduce el riesgo. Estoy comparando aseguradoras para tu perfil...",
-    quotesAfter: true,
-  },
-]
+type Step = { prompt: string; suggestions: string[]; reply: string; quotesAfter?: boolean }
+
+// Scripted assistant flow built from the onboarding profile so it already knows
+// the vehicle, its use and its usual zone — and only asks what's still missing.
+function buildScript(p: UserProfile): Step[] {
+  return [
+    {
+      prompt: `Detecté tu ${p.brand} ${p.model} ${p.year} (${p.plate}) · uso ${p.use.toLowerCase()} en ${p.zone}. ¿Qué tipo de cobertura buscás?`,
+      suggestions: ["Todo riesgo", "Terceros completo", "Responsabilidad civil"],
+      reply: "Excelente elección. ¿Dónde guardás el auto habitualmente? Esto impacta en el precio.",
+    },
+    {
+      prompt: "",
+      suggestions: ["En cochera", "En la calle"],
+      reply: "Genial, ya tengo todo. Estoy comparando aseguradoras para tu perfil...",
+      quotesAfter: true,
+    },
+  ]
+}
 
 let nextId = 1
 
 export function InsuranceChat() {
-  const [messages, setMessages] = useState<Msg[]>([
-    { id: 0, role: "assistant", text: SCRIPT[0].prompt },
-  ])
+  const [profile, setProfile] = useState<UserProfile>(defaultProfile)
+  const [messages, setMessages] = useState<Msg[]>([])
   const [stepIndex, setStepIndex] = useState(0)
   const [input, setInput] = useState("")
   const [typing, setTyping] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  const done = stepIndex >= SCRIPT.length
-  const currentSuggestions = !done && !typing ? SCRIPT[stepIndex].suggestions : []
+  const script = useMemo(() => buildScript(profile), [profile])
+
+  // Seed the greeting once on mount from the stored profile (client-only) to
+  // avoid a hydration mismatch on the personalized text.
+  useEffect(() => {
+    const p = loadProfile()
+    setProfile(p)
+    setMessages([{ id: 0, role: "assistant", text: buildScript(p)[0].prompt }])
+  }, [])
+
+  const done = stepIndex >= script.length
+  const currentSuggestions = !done && !typing ? script[stepIndex]?.suggestions ?? [] : []
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" })
@@ -60,7 +69,7 @@ export function InsuranceChat() {
     const value = text.trim()
     if (!value || typing || done) return
     setInput("")
-    const step = SCRIPT[stepIndex]
+    const step = script[stepIndex]
     setMessages((m) => [...m, { id: nextId++, role: "user", text: value }])
     setTyping(true)
 

@@ -151,14 +151,32 @@ export function getParkingSpot(id: string) {
   return parkingSpots.find((s) => s.id === id)
 }
 
-export const vehicle = {
+export type VehicleUse = "Particular" | "Comercial"
+export type FuelType = "Nafta" | "Diésel" | "GNC" | "Híbrido" | "Eléctrico"
+export type UsagePreference = "precio" | "cercania" | "rapidez"
+
+export type Vehicle = {
+  brand: string
+  model: string
+  year: number
+  plate: string
+  mileage: number
+  fuel: FuelType
+  use: VehicleUse
+  zone: string
+  preference: UsagePreference
+}
+
+export const vehicle: Vehicle = {
   brand: "Volkswagen",
   model: "Golf",
   year: 2021,
   plate: "AE 482 KP",
   mileage: 48200,
-  use: "Particular" as "Particular" | "Comercial",
+  fuel: "Nafta",
+  use: "Particular",
   zone: "Palermo, CABA",
+  preference: "precio",
 }
 
 export type Insurer = {
