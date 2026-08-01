@@ -1,5 +1,19 @@
 import type { NextConfig } from "next"
+import { withEve } from "eve/next"
 
-const nextConfig: NextConfig = {}
+const nextConfig: NextConfig = {
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        ],
+      },
+    ]
+  },
+}
 
-export default nextConfig
+// Mounts the eve agent living in `agent/` on the same origin (routes under /eve/v1/*).
+export default withEve(nextConfig)

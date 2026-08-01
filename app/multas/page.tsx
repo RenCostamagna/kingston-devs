@@ -1,14 +1,14 @@
-import { TriangleAlert } from "lucide-react"
-
-import { ModulePlaceholder } from "@/components/module-placeholder"
+import { AgentChat } from "@/components/agent/agent-chat"
 
 export default function MultasPage() {
   return (
-    <ModulePlaceholder
-      title="Multas"
-      subtitle="Consultá infracciones"
-      icon={TriangleAlert}
-      description="Vas a poder ver y pagar las infracciones asociadas a tu patente desde acá."
-    />
+    <div className="mx-auto min-h-dvh max-w-md">
+      <AgentChat
+        title="Asistente de multas"
+        subtitle="En línea · IA · conectado a Gmail"
+        greeting="Hola, soy tu asistente de multas. Puedo revisar tu Gmail para detectar infracciones nuevas, listarte las multas de una patente y pagarlas. ¿Con qué patente arrancamos?"
+        suggestions={["Revisá mi Gmail por multas nuevas", "Multas de la patente AB123CD", "Pagar mis multas de AB123CD"]}
+      />
+    </div>
   )
 }
