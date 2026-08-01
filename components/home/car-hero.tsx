@@ -3,6 +3,7 @@
 import { Car, Gauge, MapPin } from "lucide-react"
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { VehicleSwitcher } from "@/components/home/vehicle-switcher"
 import { useProfile } from "@/lib/profile"
 
 export function CarHero() {
@@ -20,6 +21,9 @@ export function CarHero() {
           <AvatarFallback className="bg-secondary text-sm font-semibold text-foreground">NC</AvatarFallback>
         </Avatar>
       </div>
+
+      {/* Vehicle selector + add */}
+      <VehicleSwitcher />
 
       {/* Car hero card */}
       <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-6">
