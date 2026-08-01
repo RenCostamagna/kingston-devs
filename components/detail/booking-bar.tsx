@@ -105,7 +105,7 @@ export function BookingBar({ spot }: { spot: ParkingSpot }) {
       </div>
 
       {/* Sticky reserve bar */}
-      <div className="sticky bottom-24 -mx-4 mt-2 flex items-center justify-between gap-4 border-t border-border bg-background/95 px-4 pt-4 backdrop-blur">
+      <div className="sticky bottom-0 -mx-4 mt-2 flex items-center justify-between gap-4 border-t border-border bg-background/95 px-4 py-4 backdrop-blur">
         <div>
           <p className="text-xs text-muted-foreground">Total estimado</p>
           <p className="text-xl font-bold">{formatCurrency(total)}</p>
