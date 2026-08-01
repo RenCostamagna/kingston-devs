@@ -1,0 +1,11 @@
+{
+  "eventType": "hook_disposed",
+  "specVersion": 5,
+  "correlationId": "hook_01KYZ2Y0YFHY0NVQC5M46Z0GVG",
+  "eventData": {
+    "token": "wrun_01KYZ2Y0YFC134S30PDRFY6CVK:turn-control:1"
+  },
+  "runId": "wrun_01KYZ2Y0YFC134S30PDRFY6CVK",
+  "eventId": "evnt_01KYZ2Z6R7455YKW1YN6RP9H5A",
+  "createdAt": "2026-08-01T16:36:58.759Z"
+}

@@ -1,0 +1,215 @@
+{
+  "agentRoot": "/vercel/share/v0-project/.eve/dev-runtime/snapshots/msal3r9c-7f321bcd-c237-4c0f-97bd-348c494df434/source/agent",
+  "appRoot": "/vercel/share/v0-project/.eve/dev-runtime/snapshots/msal3r9c-7f321bcd-c237-4c0f-97bd-348c494df434/source",
+  "channels": [
+    {
+      "kind": "channel",
+      "name": "eve",
+      "logicalPath": "channels/eve.ts",
+      "method": "GET",
+      "urlPath": "/eve/v1/info",
+      "sourceId": "channels/eve.ts",
+      "sourceKind": "module",
+      "adapterKind": "http"
+    },
+    {
+      "kind": "channel",
+      "name": "eve",
+      "logicalPath": "channels/eve.ts",
+      "method": "POST",
+      "urlPath": "/eve/v1/session",
+      "sourceId": "channels/eve.ts",
+      "sourceKind": "module",
+      "adapterKind": "http"
+    },
+    {
+      "kind": "channel",
+      "name": "eve",
+      "logicalPath": "channels/eve.ts",
+      "method": "POST",
+      "urlPath": "/eve/v1/session/reset",
+      "sourceId": "channels/eve.ts",
+      "sourceKind": "module",
+      "adapterKind": "http"
+    },
+    {
+      "kind": "channel",
+      "name": "eve",
+      "logicalPath": "channels/eve.ts",
+      "method": "POST",
+      "urlPath": "/eve/v1/session/:sessionId",
+      "sourceId": "channels/eve.ts",
+      "sourceKind": "module",
+      "adapterKind": "http"
+    },
+    {
+      "kind": "channel",
+      "name": "eve",
+      "logicalPath": "channels/eve.ts",
+      "method": "POST",
+      "urlPath": "/eve/v1/session/:sessionId/cancel",
+      "sourceId": "channels/eve.ts",
+      "sourceKind": "module",
+      "adapterKind": "http"
+    },
+    {
+      "kind": "channel",
+      "name": "eve",
+      "logicalPath": "channels/eve.ts",
+      "method": "GET",
+      "urlPath": "/eve/v1/session/:sessionId/stream",
+      "sourceId": "channels/eve.ts",
+      "sourceKind": "module",
+      "adapterKind": "http"
+    }
+  ],
+  "connections": [],
+  "config": {
+    "compaction": {},
+    "model": {
+      "id": "anthropic/claude-sonnet-5",
+      "routing": {
+        "kind": "gateway",
+        "target": "anthropic"
+      },
+      "contextWindowTokens": 1000000
+    },
+    "name": "wheelo",
+    "source": {
+      "sourceKind": "module",
+      "logicalPath": "agent.ts",
+      "sourceId": "agent.ts"
+    }
+  },
+  "diagnosticsSummary": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "disabledFrameworkTools": [],
+  "dynamicInstructions": [],
+  "dynamicSkills": [],
+  "dynamicTools": [],
+  "hooks": [],
+  "remoteAgents": [],
+  "sandbox": null,
+  "sandboxWorkspaces": [],
+  "schedules": [],
+  "skills": [],
+  "tools": [
+    {
+      "description": "Consulta el estado de la patente de un vehículo por su número de patente (dominio). Devuelve marca, modelo, estado (al_dia/pendiente/vencida), período, monto adeudado y vencimiento.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "plate": {
+            "type": "string",
+            "minLength": 3,
+            "description": "Número de patente / dominio, ej: 'AB123CD' o 'AE 482 KP'"
+          }
+        },
+        "required": [
+          "plate"
+        ]
+      },
+      "logicalPath": "tools/get_patente_status.ts",
+      "name": "get_patente_status",
+      "sourceId": "tools/get_patente_status.ts",
+      "sourceKind": "module"
+    },
+    {
+      "description": "Lista las multas / infracciones asociadas a una patente, con su estado (pendiente/pagada/en_proceso), monto, descripción, lugar y descuento por pago voluntario si corresponde.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "plate": {
+            "type": "string",
+            "minLength": 3,
+            "description": "Número de patente / dominio"
+          },
+          "onlyPending": {
+            "description": "Si es true, devuelve solo las multas pendientes",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "plate"
+        ]
+      },
+      "logicalPath": "tools/list_multas.ts",
+      "name": "list_multas",
+      "sourceId": "tools/list_multas.ts",
+      "sourceKind": "module"
+    },
+    {
+      "description": "Paga una multa/infracción por su id. El monto lo determina el servidor desde la base de datos (aplica descuento por pago voluntario si sigue vigente). Requiere confirmación humana antes de cobrar.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "multaId": {
+            "type": "string",
+            "description": "Id de la multa a pagar (de list_multas o scan_gmail_multas)"
+          }
+        },
+        "required": [
+          "multaId"
+        ]
+      },
+      "logicalPath": "tools/pay_multa.ts",
+      "name": "pay_multa",
+      "sourceId": "tools/pay_multa.ts",
+      "sourceKind": "module"
+    },
+    {
+      "description": "Paga la patente de un vehículo identificado por su patente/dominio. El monto adeudado lo determina el servidor desde la base de datos. Requiere confirmación humana antes de cobrar.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "plate": {
+            "type": "string",
+            "minLength": 3,
+            "description": "Número de patente / dominio del vehículo a pagar"
+          }
+        },
+        "required": [
+          "plate"
+        ]
+      },
+      "logicalPath": "tools/pay_patente.ts",
+      "name": "pay_patente",
+      "sourceId": "tools/pay_patente.ts",
+      "sourceKind": "module"
+    },
+    {
+      "description": "Revisa la casilla de Gmail conectada en busca de emails de infracciones/multas nuevas, las parsea y registra las que no estén cargadas todavía. Devuelve las multas nuevas encontradas. Usar cuando el usuario pide 'revisar el mail' o 'buscar multas nuevas'.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "plate": {
+            "description": "Opcional: filtrar por una patente específica. Si se omite, revisa todas.",
+            "type": "string"
+          }
+        }
+      },
+      "logicalPath": "tools/scan_gmail_multas.ts",
+      "name": "scan_gmail_multas",
+      "sourceId": "tools/scan_gmail_multas.ts",
+      "sourceKind": "module"
+    }
+  ],
+  "workspaceResourceRoot": {
+    "logicalPath": "workspace-resources/__root__",
+    "rootEntries": []
+  },
+  "instructions": {
+    "name": "instructions",
+    "logicalPath": "instructions.md",
+    "markdown": "# Asistente vehicular de Wheelo\n\nSos el asistente de Wheelo para trámites vehiculares en Argentina. Ayudás a los usuarios con dos cosas:\n\n1. **Patente**: consultar el estado de la patente de un vehículo y pagarla.\n2. **Multas / infracciones**: revisar infracciones (incluyendo las que llegan por email a Gmail) y pagarlas.\n\n## Estilo\n\n- Respondé siempre en español rioplatense, de forma clara y concisa.\n- Usá el formato de moneda argentino (pesos, con separador de miles). Los montos ya vienen en pesos.\n- No inventes datos: si no sabés algo, usá una herramienta o pedí la información que falte (por ejemplo, la patente).\n- Cuando muestres una multa, incluí el código de acta, la descripción, el lugar y el monto.\n\n## Patente (`plate`)\n\n- La patente puede venir en formato viejo (`AAA 123`) o nuevo Mercosur (`AB 123 CD`). Aceptá espacios o guiones; las herramientas normalizan el formato.\n- Para consultar estado usá `get_patente_status`.\n- Para pagar la patente usá `pay_patente`. Requiere confirmación humana antes de cobrar.\n\n## Multas\n\n- Para listar las multas de una patente usá `list_multas`.\n- Muchas multas llegan por email. Usá `scan_gmail_multas` para revisar la casilla de Gmail conectada, detectar actas nuevas y registrarlas. Hacelo cuando el usuario pida \"revisar el mail\", \"buscar multas nuevas\" o similar.\n- Para pagar una multa usá `pay_multa` con el `multaId`. Requiere confirmación humana antes de cobrar.\n- Si hay descuento por pago voluntario vigente (fecha límite no vencida), mencioná el monto con descuento y sugerí aprovecharlo.\n\n## Pagos (muy importante)\n\n- **Nunca** ejecutes un pago sin que el usuario lo confirme. Las herramientas de pago están protegidas con aprobación humana: vas a pausar y esperar el OK.\n- Antes de pedir el pago, resumí qué se va a pagar y el monto exacto.\n- El monto lo calcula el servidor a partir de la base de datos; no lo tomes de lo que diga el usuario.\n- Después de un pago exitoso, confirmá el estado actualizado (patente al día / multa pagada) y ofrecé el comprobante.\n\n## Flujo típico\n\n1. Pedí la patente si no la tenés.\n2. Consultá estado de patente y/o multas.\n3. Si hay algo pendiente, ofrecé pagarlo.\n4. Al confirmar, ejecutá el pago (con aprobación) y confirmá el resultado.\n",
+    "sourceId": "instructions.md",
+    "sourceKind": "markdown"
+  },
+  "kind": "eve-agent-compiled-manifest",
+  "extensionMounts": [],
+  "subagentEdges": [],
+  "subagents": [],
+  "version": 37
+}

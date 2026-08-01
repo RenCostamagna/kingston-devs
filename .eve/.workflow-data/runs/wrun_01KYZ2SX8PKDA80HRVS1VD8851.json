@@ -1,0 +1,41 @@
+{
+  "runId": "wrun_01KYZ2SX8PKDA80HRVS1VD8851",
+  "deploymentId": "msal9tv9-cf66b9a6-772b-47c1-9f83-cc028cebda95",
+  "workflowName": "workflow//eve//turnWorkflow",
+  "specVersion": 5,
+  "executionContext": {
+    "traceCarrier": {},
+    "workflowCoreVersion": "5.0.0-beta.38",
+    "features": {
+      "encryption": false
+    }
+  },
+  "input": {
+    "__type": "Uint8Array",
+    "data": "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"
+  },
+  "createdAt": "2026-08-01T16:34:05.208Z",
+  "startedAt": "2026-08-01T16:34:05.214Z",
+  "status": "completed",
+  "output": {
+    "__type": "Uint8Array",
+    "data": "ZGV2bC0x"
+  },
+  "completedAt": "2026-08-01T16:34:11.075Z",
+  "updatedAt": "2026-08-01T16:34:11.075Z",
+  "attributes": {
+    "$rootRunId": "wrun_01KYZ2SX5ARTTFWWA6D9GMM3RJ",
+    "$parentRunId": "wrun_01KYZ2SX5ARTTFWWA6D9GMM3RJ",
+    "$eve.channel_request_id": "gj9hm-1785602045082-6bafafc3918f",
+    "$eve.type": "turn",
+    "$eve.parent": "wrun_01KYZ2SX5ARTTFWWA6D9GMM3RJ",
+    "$eve.root": "wrun_01KYZ2SX5ARTTFWWA6D9GMM3RJ",
+    "$eve.model": "anthropic/claude-sonnet-5",
+    "$eve.input_tokens": "15377",
+    "$eve.output_tokens": "406",
+    "$eve.cache_read_tokens": "15148",
+    "$eve.cache_write_tokens": "225",
+    "$eve.cost_usd": "0.0070976",
+    "$eve.tool_count": "16"
+  }
+}
