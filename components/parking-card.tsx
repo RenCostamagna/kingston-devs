@@ -7,7 +7,13 @@ import { Button } from "@/components/ui/button"
 import { formatCurrency, formatKm } from "@/lib/format"
 import type { ParkingSpot } from "@/lib/mock-data"
 
-export function ParkingCardHorizontal({ spot }: { spot: ParkingSpot }) {
+export function ParkingCardHorizontal({
+  spot,
+  priority = false,
+}: {
+  spot: ParkingSpot
+  priority?: boolean
+}) {
   return (
     <Link
       href={`/cochera/${spot.id}`}
@@ -19,6 +25,7 @@ export function ParkingCardHorizontal({ spot }: { spot: ParkingSpot }) {
           alt={`Cochera en ${spot.address}`}
           fill
           sizes="256px"
+          priority={priority}
           className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
         <span className="absolute right-2 top-2 rounded-full bg-background/85 px-2 py-1 text-xs font-medium backdrop-blur">
@@ -77,6 +84,7 @@ export function ParkingCardList({ spot }: { spot: ParkingSpot }) {
         ))}
         <Button
           render={<Link href={`/cochera/${spot.id}`} />}
+          nativeButton={false}
           size="sm"
           className="ml-auto rounded-full"
         >

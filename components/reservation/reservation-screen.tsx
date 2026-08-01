@@ -179,10 +179,16 @@ function SuccessView({
       </div>
 
       <div className="flex w-full flex-col gap-3">
-        <Button render={<Link href="/" />} size="lg" className="h-12 rounded-xl">
+        <Button render={<Link href="/" />} nativeButton={false} size="lg" className="h-12 rounded-xl">
           Volver al inicio
         </Button>
-        <Button render={<Link href="/buscar" />} variant="outline" size="lg" className="h-12 rounded-xl">
+        <Button
+          render={<Link href="/buscar" />}
+          nativeButton={false}
+          variant="outline"
+          size="lg"
+          className="h-12 rounded-xl"
+        >
           Buscar otra cochera
         </Button>
       </div>

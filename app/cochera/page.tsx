@@ -31,8 +31,8 @@ export default function CocheraPage() {
             </Link>
           </div>
           <div className="flex gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {featured.map((spot) => (
-              <ParkingCardHorizontal key={spot.id} spot={spot} />
+            {featured.map((spot, index) => (
+              <ParkingCardHorizontal key={spot.id} spot={spot} priority={index === 0} />
             ))}
           </div>
         </section>
@@ -41,6 +41,7 @@ export default function CocheraPage() {
         <section className="px-5">
           <Button
             render={<Link href="/publicar" />}
+            nativeButton={false}
             variant="outline"
             size="lg"
             className="h-12 w-full rounded-xl border-dashed"
