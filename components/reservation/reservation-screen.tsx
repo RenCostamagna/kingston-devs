@@ -179,11 +179,11 @@ function SuccessView({
       </div>
 
       <div className="flex w-full flex-col gap-3">
-        <Button asChild size="lg" className="h-12 rounded-xl">
-          <Link href="/">Volver al inicio</Link>
+        <Button render={<Link href="/" />} size="lg" className="h-12 rounded-xl">
+          Volver al inicio
         </Button>
-        <Button asChild variant="outline" size="lg" className="h-12 rounded-xl">
-          <Link href="/buscar">Buscar otra cochera</Link>
+        <Button render={<Link href="/buscar" />} variant="outline" size="lg" className="h-12 rounded-xl">
+          Buscar otra cochera
         </Button>
       </div>
     </div>

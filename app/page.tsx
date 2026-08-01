@@ -39,11 +39,14 @@ export default function HomePage() {
 
         {/* Secondary: publish your own parking */}
         <section className="px-5">
-          <Button asChild variant="outline" size="lg" className="h-12 w-full rounded-xl border-dashed">
-            <Link href="/publicar">
-              <PlusCircle data-icon="inline-start" />
-              Publicar mi cochera
-            </Link>
+          <Button
+            render={<Link href="/publicar" />}
+            variant="outline"
+            size="lg"
+            className="h-12 w-full rounded-xl border-dashed"
+          >
+            <PlusCircle data-icon="inline-start" />
+            Publicar mi cochera
           </Button>
         </section>
 

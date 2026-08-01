@@ -75,8 +75,12 @@ export function ParkingCardList({ spot }: { spot: ParkingSpot }) {
         {spot.features.slice(0, 3).map((f) => (
           <FeatureBadge key={f} feature={f} />
         ))}
-        <Button asChild size="sm" className="ml-auto rounded-full">
-          <Link href={`/cochera/${spot.id}`}>Ver más</Link>
+        <Button
+          render={<Link href={`/cochera/${spot.id}`} />}
+          size="sm"
+          className="ml-auto rounded-full"
+        >
+          Ver más
         </Button>
       </div>
     </div>

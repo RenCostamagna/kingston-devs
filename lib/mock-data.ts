@@ -27,6 +27,15 @@ export const featureLabels: Record<ParkingFeature, string> = {
   seguridad: "Seguridad",
 }
 
+export const allFeatures: ParkingFeature[] = [
+  "techada",
+  "camara",
+  "grande",
+  "electrico",
+  "24hs",
+  "seguridad",
+]
+
 export const parkingSpots: ParkingSpot[] = [
   {
     id: "palermo-01",
