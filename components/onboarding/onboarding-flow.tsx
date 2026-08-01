@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { ArrowRight } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { ONBOARDING_KEY } from "@/components/onboarding/onboarding-gate"
 import { cn } from "@/lib/utils"
 
 const SLIDES = [
@@ -33,6 +34,7 @@ export function OnboardingFlow() {
   const slide = SLIDES[index]
 
   function finish() {
+    localStorage.setItem(ONBOARDING_KEY, "1")
     router.push("/")
   }
 

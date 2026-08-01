@@ -2,6 +2,7 @@ import Link from "next/link"
 import { ArrowRight, PlusCircle, Shield } from "lucide-react"
 
 import { AppShell } from "@/components/app-shell"
+import { OnboardingGate } from "@/components/onboarding/onboarding-gate"
 import { HomeHeader } from "@/components/home/home-header"
 import { ParkingSearchHero } from "@/components/home/parking-search-hero"
 import { ParkingCardHorizontal } from "@/components/parking-card"
@@ -12,8 +13,9 @@ export default function HomePage() {
   const featured = parkingSpots.slice(0, 5)
 
   return (
-    <AppShell>
-      <HomeHeader />
+    <OnboardingGate>
+      <AppShell>
+        <HomeHeader />
 
       <main className="mt-6 flex flex-col gap-8">
         {/* Primary: parking search */}
@@ -69,6 +71,7 @@ export default function HomePage() {
           </Link>
         </section>
       </main>
-    </AppShell>
+      </AppShell>
+    </OnboardingGate>
   )
 }
