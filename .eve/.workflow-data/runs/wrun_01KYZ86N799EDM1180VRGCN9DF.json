@@ -1,0 +1,32 @@
+{
+  "runId": "wrun_01KYZ86N799EDM1180VRGCN9DF",
+  "deploymentId": "msaop2mw-65d285c8-2d9c-4ac9-8042-f9a87214f787",
+  "workflowName": "workflow//eve//workflowEntry",
+  "specVersion": 5,
+  "executionContext": {
+    "traceCarrier": {},
+    "workflowCoreVersion": "5.0.0-beta.38",
+    "features": {
+      "encryption": false
+    }
+  },
+  "input": {
+    "__type": "Uint8Array",
+    "data": "ZGV2bFtbMV0seyJpbnB1dCI6MiwibGltaXRzIjotMSwic2VyaWFsaXplZENvbnRleHQiOjR9LHsibWVzc2FnZSI6MywiY29udGV4dCI6LTEsIm91dHB1dFNjaGVtYSI6LTF9LCJDb25zdWx0w6EgbWlzIG11bHRhcyBlbiBSb3NhcmlvIGRlIGxhIHBhdGVudGUgQUIxMjNDRCIseyJldmUuYnVuZGxlIjo1LCJldmUuY2hhbm5lbCI6OCwiZXZlLmNoYW5uZWxJbnN0cnVtZW50YXRpb24iOjExLCJldmUuY29udGludWF0aW9uVG9rZW4iOjE0LCJldmUubW9kZSI6MTUsImV2ZS5hdXRoIjoxNiwiZXZlLmluaXRpYXRvckF1dGgiOjE2LCJldmUuY2FwYWJpbGl0aWVzIjoyMCwiZXZlLmNoYW5uZWxSZXF1ZXN0SWQiOjIyfSx7Im5vZGVJZCI6LTEsInNvdXJjZSI6Nn0seyJraW5kIjo3fSwiZGV2ZWxvcG1lbnQiLHsia2luZCI6OSwic3RhdGUiOjEwfSwiaHR0cCIse30seyJraW5kIjoxMiwibWV0YWRhdGEiOjEzfSwiY2hhbm5lbDpldmUiLHt9LCJldmU6ZXZlOjUxZTcyOTEzLTNkMjEtNDI0Zi1iZmI1LWY1NzQ2MjE3M2ZkMiIsImNvbnZlcnNhdGlvbiIseyJhdHRyaWJ1dGVzIjoxNywiYXV0aGVudGljYXRvciI6MTgsInByaW5jaXBhbElkIjoxOSwicHJpbmNpcGFsVHlwZSI6MTl9LHt9LCJub25lIiwiYW5vbnltb3VzIix7InJlcXVlc3RJbnB1dCI6MjF9LHRydWUsInZ3OGJxLTE3ODU2MDc3MDU2MjctYzc3MWE0YTI2MmQ2Il0="
+  },
+  "createdAt": "2026-08-01T18:08:25.838Z",
+  "startedAt": "2026-08-01T18:08:25.851Z",
+  "status": "completed",
+  "output": {
+    "__type": "Uint8Array",
+    "data": "ZGV2bFt7Im91dHB1dCI6MX0sIiJd"
+  },
+  "completedAt": "2026-08-01T18:08:27.299Z",
+  "updatedAt": "2026-08-01T18:08:27.299Z",
+  "attributes": {
+    "$eve.channel_request_id": "vw8bq-1785607705627-c771a4a262d6",
+    "$eve.type": "session",
+    "$eve.trigger": "http",
+    "$eve.title": "Consultá mis multas en Rosario de la patente AB123CD"
+  }
+}

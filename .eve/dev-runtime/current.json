@@ -1,7 +1,7 @@
 {
   "appRoot": "/vercel/share/v0-project",
   "kind": "eve-dev-runtime-artifacts-pointer",
-  "runtimeAppRoot": "/vercel/share/v0-project/.eve/dev-runtime/snapshots/msao4h6c-c3882677-8752-4808-af87-d47c59e0d93a/source",
-  "snapshotRoot": "/vercel/share/v0-project/.eve/dev-runtime/snapshots/msao4h6c-c3882677-8752-4808-af87-d47c59e0d93a",
+  "runtimeAppRoot": "/vercel/share/v0-project/.eve/dev-runtime/snapshots/msaop2mw-65d285c8-2d9c-4ac9-8042-f9a87214f787/source",
+  "snapshotRoot": "/vercel/share/v0-project/.eve/dev-runtime/snapshots/msaop2mw-65d285c8-2d9c-4ac9-8042-f9a87214f787",
   "version": 2
 }
