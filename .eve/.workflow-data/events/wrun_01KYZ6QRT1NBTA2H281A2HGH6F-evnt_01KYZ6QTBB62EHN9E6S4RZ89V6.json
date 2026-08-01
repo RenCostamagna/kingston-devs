@@ -1,0 +1,11 @@
+{
+  "eventType": "hook_disposed",
+  "specVersion": 5,
+  "correlationId": "hook_01KYZ6QRT1JCA3RY59RD45VEDV",
+  "eventData": {
+    "token": "eve:eve:10ae751f-2627-4e61-b582-87dc4323906b"
+  },
+  "runId": "wrun_01KYZ6QRT1NBTA2H281A2HGH6F",
+  "eventId": "evnt_01KYZ6QTBB62EHN9E6S4RZ89V6",
+  "createdAt": "2026-08-01T17:42:50.987Z"
+}
