@@ -1,0 +1,191 @@
+"use client"
+
+import Image from "next/image"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { ArrowLeft, Calendar, Check, Clock, MapPin } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
+import { formatCurrency } from "@/lib/format"
+import type { ParkingSpot } from "@/lib/mock-data"
+
+const dayLabels: Record<string, string> = {
+  hoy: "Hoy, 12 mar",
+  manana: "Mañana, 13 mar",
+  jueves: "Jueves 14 mar",
+  viernes: "Viernes 15 mar",
+}
+
+export function ReservationScreen({
+  spot,
+  day,
+  time,
+  duration,
+}: {
+  spot: ParkingSpot
+  day: string
+  time: string
+  duration: number
+}) {
+  const router = useRouter()
+  const [confirmed, setConfirmed] = useState(false)
+
+  const subtotal = spot.pricePerHour * duration
+  const serviceFee = Math.round(subtotal * 0.1)
+  const total = subtotal + serviceFee
+
+  if (confirmed) {
+    return <SuccessView spot={spot} day={day} time={time} duration={duration} total={total} />
+  }
+
+  return (
+    <div className="flex min-h-dvh flex-col">
+      <header className="flex items-center gap-3 px-4 pb-2 pt-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="rounded-full"
+          onClick={() => router.back()}
+          aria-label="Volver"
+        >
+          <ArrowLeft />
+        </Button>
+        <h1 className="text-lg font-bold">Confirmá tu reserva</h1>
+      </header>
+
+      <main className="flex flex-1 flex-col gap-4 px-4 py-2">
+        {/* Spot summary */}
+        <div className="flex gap-3 rounded-2xl border border-border bg-card p-3">
+          <div className="relative size-20 shrink-0 overflow-hidden rounded-xl">
+            <Image src={spot.image || "/placeholder.svg"} alt={spot.title} fill sizes="80px" className="object-cover" />
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold">{spot.title}</p>
+            <p className="flex items-center gap-1 truncate text-xs text-muted-foreground">
+              <MapPin className="size-3.5 shrink-0" />
+              {spot.address}
+            </p>
+            <p className="mt-1 text-sm font-medium text-primary">{formatCurrency(spot.pricePerHour)} /hora</p>
+          </div>
+        </div>
+
+        {/* Booking details */}
+        <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex size-9 items-center justify-center rounded-lg bg-secondary">
+              <Calendar className="size-4 text-primary" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Fecha</p>
+              <p className="text-sm font-medium">{dayLabels[day] ?? day}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex size-9 items-center justify-center rounded-lg bg-secondary">
+              <Clock className="size-4 text-primary" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Horario</p>
+              <p className="text-sm font-medium">
+                {time} · {duration} {duration === 1 ? "hora" : "horas"}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Price breakdown */}
+        <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">
+              {formatCurrency(spot.pricePerHour)} × {duration} {duration === 1 ? "hora" : "horas"}
+            </span>
+            <span>{formatCurrency(subtotal)}</span>
+          </div>
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">Cargo por servicio</span>
+            <span>{formatCurrency(serviceFee)}</span>
+          </div>
+          <Separator />
+          <div className="flex items-center justify-between text-base font-bold">
+            <span>Total</span>
+            <span className="text-primary">{formatCurrency(total)}</span>
+          </div>
+        </div>
+      </main>
+
+      <div className="sticky bottom-0 border-t border-border bg-background/95 px-4 py-4 backdrop-blur">
+        <Button
+          size="lg"
+          className="h-12 w-full rounded-xl text-base font-semibold"
+          onClick={() => setConfirmed(true)}
+        >
+          Confirmar reserva · {formatCurrency(total)}
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+function SuccessView({
+  spot,
+  day,
+  time,
+  duration,
+  total,
+}: {
+  spot: ParkingSpot
+  day: string
+  time: string
+  duration: number
+  total: number
+}) {
+  return (
+    <div className="flex min-h-dvh flex-col items-center justify-center gap-6 px-6 text-center">
+      <div className="flex size-20 items-center justify-center rounded-full bg-primary/15">
+        <div className="flex size-14 items-center justify-center rounded-full bg-primary">
+          <Check className="size-8 text-primary-foreground" strokeWidth={3} />
+        </div>
+      </div>
+      <div className="flex flex-col gap-1">
+        <h1 className="text-2xl font-bold">¡Reserva confirmada!</h1>
+        <p className="text-pretty text-sm text-muted-foreground">
+          Te esperamos en {spot.title}. Ya te enviamos los detalles por correo.
+        </p>
+      </div>
+
+      <div className="w-full rounded-2xl border border-border bg-card p-4 text-left">
+        <div className="flex items-center justify-between border-b border-border pb-3">
+          <span className="text-sm text-muted-foreground">Cochera</span>
+          <span className="text-sm font-medium">{spot.neighborhood}</span>
+        </div>
+        <div className="flex items-center justify-between border-b border-border py-3">
+          <span className="text-sm text-muted-foreground">Fecha y hora</span>
+          <span className="text-sm font-medium">
+            {dayLabels[day] ?? day} · {time}
+          </span>
+        </div>
+        <div className="flex items-center justify-between border-b border-border py-3">
+          <span className="text-sm text-muted-foreground">Duración</span>
+          <span className="text-sm font-medium">
+            {duration} {duration === 1 ? "hora" : "horas"}
+          </span>
+        </div>
+        <div className="flex items-center justify-between pt-3">
+          <span className="text-sm font-semibold">Total pagado</span>
+          <span className="text-base font-bold text-primary">{formatCurrency(total)}</span>
+        </div>
+      </div>
+
+      <div className="flex w-full flex-col gap-3">
+        <Button asChild size="lg" className="h-12 rounded-xl">
+          <Link href="/">Volver al inicio</Link>
+        </Button>
+        <Button asChild variant="outline" size="lg" className="h-12 rounded-xl">
+          <Link href="/buscar">Buscar otra cochera</Link>
+        </Button>
+      </div>
+    </div>
+  )
+}
