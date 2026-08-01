@@ -3,14 +3,39 @@
 import { useSyncExternalStore } from "react"
 
 import { vehicle, type Vehicle } from "./mock-data"
+import { todayISO, type ExpirationKey, type ServiceType } from "./vehicle-insights"
 
 export const PROFILE_KEY = "wheelo:profile"
 export const GARAGE_KEY = "wheelo:garage"
 
 export type UserProfile = Vehicle
 
+/** Lectura del odómetro cargada por el usuario en una fecha puntual. */
+export type OdometerReading = { id: string; km: number; date: string }
+
+export type ServiceRecord = {
+  id: string
+  type: ServiceType
+  date: string
+  km: number
+  cost?: number
+  workshop?: string
+  notes?: string
+}
+
+export type FuelLog = { id: string; date: string; km: number; liters: number; cost: number }
+
+export type VehicleRecords = {
+  odometer: OdometerReading[]
+  services: ServiceRecord[]
+  expirations: Partial<Record<ExpirationKey, string>>
+  fuel: FuelLog[]
+}
+
+export const emptyRecords: VehicleRecords = { odometer: [], services: [], expirations: {}, fuel: [] }
+
 /** A vehicle stored in the garage, identified so it can be selected/removed. */
-export type GarageVehicle = UserProfile & { id: string }
+export type GarageVehicle = UserProfile & { id: string; records: VehicleRecords }
 
 export type Garage = {
   vehicles: GarageVehicle[]
@@ -19,17 +44,30 @@ export type Garage = {
 
 export const defaultProfile: UserProfile = vehicle
 
-function makeId() {
-  return `veh-${Math.random().toString(36).slice(2, 10)}`
+function makeId(prefix = "veh") {
+  return `${prefix}-${Math.random().toString(36).slice(2, 10)}`
+}
+
+/** Completa los registros faltantes al leer datos guardados por versiones previas. */
+function normalizeRecords(records?: Partial<VehicleRecords>): VehicleRecords {
+  return {
+    odometer: records?.odometer ?? [],
+    services: records?.services ?? [],
+    expirations: records?.expirations ?? {},
+    fuel: records?.fuel ?? [],
+  }
 }
 
 function buildGarage(vehicles: GarageVehicle[], selectedId?: string): Garage {
-  const list = vehicles.length > 0 ? vehicles : [{ ...defaultProfile, id: makeId() }]
+  const list =
+    vehicles.length > 0 ? vehicles : [{ ...defaultProfile, id: makeId(), records: normalizeRecords() }]
   const selected = list.some((v) => v.id === selectedId) ? (selectedId as string) : list[0].id
   return { vehicles: list, selectedId: selected }
 }
 
-export const defaultGarage: Garage = buildGarage([{ ...defaultProfile, id: "veh-default" }])
+export const defaultGarage: Garage = buildGarage([
+  { ...defaultProfile, id: "veh-default", records: normalizeRecords() },
+])
 
 function readGarage(): Garage {
   if (typeof window === "undefined") return defaultGarage
@@ -39,7 +77,7 @@ function readGarage(): Garage {
       const parsed = JSON.parse(raw) as Partial<Garage>
       const vehicles = (parsed.vehicles ?? [])
         .filter(Boolean)
-        .map((v) => ({ ...defaultProfile, ...v, id: v.id || makeId() }))
+        .map((v) => ({ ...defaultProfile, ...v, id: v.id || makeId(), records: normalizeRecords(v.records) }))
       return buildGarage(vehicles, parsed.selectedId)
     }
 
@@ -47,7 +85,7 @@ function readGarage(): Garage {
     const legacy = window.localStorage.getItem(PROFILE_KEY)
     if (legacy) {
       const parsed = JSON.parse(legacy) as Partial<UserProfile>
-      return buildGarage([{ ...defaultProfile, ...parsed, id: makeId() }])
+      return buildGarage([{ ...defaultProfile, ...parsed, id: makeId(), records: normalizeRecords() }])
     }
   } catch {
     // ignore malformed/unavailable storage
@@ -116,7 +154,15 @@ export function saveProfile(profile: UserProfile) {
 
 export function addVehicle(profile: UserProfile): GarageVehicle {
   const g = getSnapshot()
-  const created: GarageVehicle = { ...profile, id: makeId() }
+  // El km inicial cuenta como la primera lectura del odómetro.
+  const created: GarageVehicle = {
+    ...profile,
+    id: makeId(),
+    records: {
+      ...emptyRecords,
+      odometer: [{ id: makeId("odo"), km: profile.mileage, date: todayISO() }],
+    },
+  }
   writeGarage({ vehicles: [...g.vehicles, created], selectedId: created.id })
   return created
 }
@@ -134,6 +180,69 @@ export function removeVehicle(id: string) {
   writeGarage(buildGarage(vehicles, g.selectedId === id ? vehicles[0].id : g.selectedId))
 }
 
+// --- registros del vehículo ---------------------------------------------
+
+/** Aplica un cambio sobre los registros de un vehículo del garage. */
+function updateRecords(vehicleId: string, fn: (records: VehicleRecords) => VehicleRecords) {
+  const g = getSnapshot()
+  writeGarage({
+    ...g,
+    vehicles: g.vehicles.map((v) => (v.id === vehicleId ? { ...v, records: fn(v.records) } : v)),
+  })
+}
+
+/** Registra una lectura del odómetro y sincroniza el km del vehículo. */
+export function addOdometerReading(vehicleId: string, km: number, date: string) {
+  const g = getSnapshot()
+  const reading: OdometerReading = { id: makeId("odo"), km, date }
+  writeGarage({
+    ...g,
+    vehicles: g.vehicles.map((v) => {
+      if (v.id !== vehicleId) return v
+      const odometer = [...v.records.odometer.filter((r) => r.date !== date), reading].sort((a, b) =>
+        a.date.localeCompare(b.date),
+      )
+      // mileage refleja siempre la última lectura para el resto de la app.
+      return { ...v, mileage: odometer.at(-1)?.km ?? km, records: { ...v.records, odometer } }
+    }),
+  })
+}
+
+export function removeOdometerReading(vehicleId: string, readingId: string) {
+  updateRecords(vehicleId, (r) => ({ ...r, odometer: r.odometer.filter((x) => x.id !== readingId) }))
+}
+
+export function addServiceRecord(vehicleId: string, record: Omit<ServiceRecord, "id">) {
+  updateRecords(vehicleId, (r) => ({
+    ...r,
+    services: [...r.services, { ...record, id: makeId("srv") }].sort((a, b) => b.date.localeCompare(a.date)),
+  }))
+}
+
+export function removeServiceRecord(vehicleId: string, recordId: string) {
+  updateRecords(vehicleId, (r) => ({ ...r, services: r.services.filter((x) => x.id !== recordId) }))
+}
+
+export function setExpiration(vehicleId: string, key: ExpirationKey, date: string | null) {
+  updateRecords(vehicleId, (r) => {
+    const expirations = { ...r.expirations }
+    if (date) expirations[key] = date
+    else delete expirations[key]
+    return { ...r, expirations }
+  })
+}
+
+export function addFuelLog(vehicleId: string, log: Omit<FuelLog, "id">) {
+  updateRecords(vehicleId, (r) => ({
+    ...r,
+    fuel: [...r.fuel, { ...log, id: makeId("fuel") }].sort((a, b) => b.date.localeCompare(a.date)),
+  }))
+}
+
+export function removeFuelLog(vehicleId: string, logId: string) {
+  updateRecords(vehicleId, (r) => ({ ...r, fuel: r.fuel.filter((x) => x.id !== logId) }))
+}
+
 /** Reactive garage state. Server render uses the default so hydration matches. */
 export function useGarage(): Garage {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
@@ -141,6 +250,11 @@ export function useGarage(): Garage {
 
 /** Reactive selected vehicle. */
 export function useProfile(): UserProfile {
+  return useSelectedVehicle()
+}
+
+/** Reactive selected vehicle including its id and records. */
+export function useSelectedVehicle(): GarageVehicle {
   const garage = useGarage()
-  return garage.vehicles.find((v) => v.id === garage.selectedId) ?? defaultProfile
+  return garage.vehicles.find((v) => v.id === garage.selectedId) ?? garage.vehicles[0]
 }
