@@ -56,7 +56,9 @@ function toDirective(text: string): string {
 }
 
 export default defineSchedule({
-  cron: "0 */2 * * *",
+  // Once a day (Vercel Hobby plan only allows daily cron jobs). Vercel
+  // evaluates cron in UTC — 12:00 UTC is 09:00 in Argentina (UTC-3).
+  cron: "0 12 * * *",
   async run({ receive, waitUntil, appAuth }) {
     const to = process.env.NOTIFY_WHATSAPP_TO
     if (!to) return
