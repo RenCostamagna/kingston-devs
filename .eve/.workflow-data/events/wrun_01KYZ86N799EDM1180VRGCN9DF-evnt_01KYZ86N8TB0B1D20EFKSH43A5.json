@@ -1,0 +1,12 @@
+{
+  "eventType": "hook_created",
+  "specVersion": 5,
+  "correlationId": "hook_01KYZ86N791SNNS1NJ2V1NAH3E",
+  "eventData": {
+    "token": "eve:eve:51e72913-3d21-424f-bfb5-f57462173fd2",
+    "isWebhook": false
+  },
+  "runId": "wrun_01KYZ86N799EDM1180VRGCN9DF",
+  "eventId": "evnt_01KYZ86N8TB0B1D20EFKSH43A5",
+  "createdAt": "2026-08-01T18:08:25.882Z"
+}

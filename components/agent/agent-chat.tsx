@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils"
 const TOOL_LABELS: Record<string, string> = {
   get_patente_status: "Consultando estado de patente",
   list_multas: "Buscando multas",
+  fetch_multas_rosario: "Consultando multas en Rosario",
   scan_gmail_multas: "Revisando Gmail",
   pay_multa: "Preparando pago de multa",
   pay_patente: "Preparando pago de patente",

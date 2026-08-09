@@ -34,3 +34,8 @@ pnpm-debug.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# eve (local dev runtime state; production uses managed Vercel Workflow)
+.workflow-data/
+.eve/
+.vercel/
